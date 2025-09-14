@@ -25,3 +25,12 @@ class Transaction:
 
     def searchByDate(self, date: "datetime") -> list["Transaction"]:
         return []
+
+    def __str__(self) -> str:
+        header = " ".join(["Transaction:", self.dateTime.strftime("%Y-%m-%d %H:%M:%S")])
+        lines = [
+            " ".join([c.name + ":", "$" + format(getattr(c, "price", 0.0), ".2f")])
+            for c in self.items
+        ]
+        total = " ".join(["Total:", "$" + format(self.getTotalPrice(), ".2f")])
+        return "\n".join([header] + lines + [total])

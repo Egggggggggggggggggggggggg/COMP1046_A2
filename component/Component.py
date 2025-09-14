@@ -4,7 +4,9 @@ class Component:
         self.price = price
 
     def showDetails(self) -> str:
-        return f"{self.__class__.__name__}({self.name}, ${self.price:.2f})"
+        cls = self.__class__.__name__
+        price_str = "$" + format(self.price, ".2f")
+        return "".join([cls, "(", self.name, ", ", price_str, ")"])
 
     def toCSV(self) -> str:
         return ""

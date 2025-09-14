@@ -17,7 +17,7 @@ class Menu:
             elif choice == "3":
                 self._transactions_menu()
             elif choice == "4":
-                print("Bye.")
+                print("Exiting...")
                 return
             else:
                 print("Invalid choice.")
