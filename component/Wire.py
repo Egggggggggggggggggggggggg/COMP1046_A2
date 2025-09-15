@@ -1,3 +1,12 @@
+# Academic Integrity Statment
+# Filename: Wire.py
+# Author: Botao Huang
+# Student ID: 521560
+# Email: 521560@learning.eynesbury.edu.au
+# Date: 15 SEP 2025
+# Description: Wire class
+# This is my own work as defined by the Academic Integrity Policy
+
 from component.Component import Component
 
 class Wire(Component):
