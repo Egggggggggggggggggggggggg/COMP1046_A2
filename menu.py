@@ -6,7 +6,7 @@ class Menu:
         while True:
             print("\n" + title)
             for i, option in enumerate(options, start=1):
-                print(i, option[0])
+                print(str(i) + ". " + option[0])
             choice = input("Please enter a number: ").strip()
             try:
                 index = int(choice) - 1
