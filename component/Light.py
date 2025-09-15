@@ -38,3 +38,13 @@ class Light(Component):
     def calculateWasted(self) -> float:
         #
         return 0.0
+
+    def isEqual(self, other:"Light") -> bool:
+        return isinstance(other, Light) and \
+        self.name == other.name and \
+        self.price == other.price and \
+        self.colour == other.colour and \
+        self.voltage == other.voltage and \
+        self.current == other.current
+    
+    
