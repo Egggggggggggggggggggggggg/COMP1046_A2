@@ -1,14 +1,21 @@
-from component.PowerSupply import PowerSupply
 from component.Component import Component
 
-class Solarpanel(PowerSupply):
+class Solarpanel(Component):
     def __init__(self, voltage: float, current: float, price: float) -> None:
-        super().__init__("Solar Panel", voltage, price)
+        super().__init__("Solar Panel", price)
+        self.__voltage = voltage
         self.__current = current
+
+    @property
+    def voltage(self) -> float:
+        return self.__voltage
 
     @property
     def current(self) -> float:
         return self.__current
+
+    def showDetails(self) -> str:
+        return self.toString()
 
     def duplicate(self) -> "Solarpanel":
         return Solarpanel(self.voltage, self.current, self.price)
