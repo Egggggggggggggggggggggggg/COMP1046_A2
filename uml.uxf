@@ -1,4 +1,4 @@
-<diagram program="umletino" version="15.1"><zoom_level>4</zoom_level><help_text></help_text><element><id>UMLClass</id><coordinates><x>372</x><y>260</y><w>76</w><h>68</h></coordinates><panel_attributes>Wire
+<diagram program="umletino" version="15.1"><zoom_level>7</zoom_level><help_text></help_text><element><id>UMLClass</id><coordinates><x>651</x><y>455</y><w>133</w><h>119</h></coordinates><panel_attributes>Wire
 --
 -  length: float
 
@@ -6,14 +6,14 @@
 --
 + duplicate(): wire
 + fromstring(data: string): Wire
-+ isEquals(other: Wire): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>460</x><y>260</y><w>80</w><h>68</h></coordinates><panel_attributes>Battery
++ isEquals(other: Wire): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>805</x><y>455</y><w>140</w><h>119</h></coordinates><panel_attributes>Battery
 --
 -  size: string
 -  voltage: float
 --
 + duplicate(): Battery
 + fromstring(data: string): Battery
-+ isEquals(Other: Battery): Battery</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>740</x><y>260</y><w>92</w><h>68</h></coordinates><panel_attributes>Solarpanel
++ isEquals(Other: Battery): Battery</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1295</x><y>455</y><w>161</w><h>119</h></coordinates><panel_attributes>Solarpanel
 --
 -  voltage: float
 -  current: float
@@ -21,19 +21,19 @@
 + duplicate(): SolarPanel
 + fromstring(data: string): Solarpanel
 + isEqulas(other: Solarpanel): boolean
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>832</x><y>492</y><w>60</w><h>56</h></coordinates><panel_attributes>LED
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1456</x><y>861</y><w>105</w><h>98</h></coordinates><panel_attributes>LED
 --
 
 
 --
 
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>708</x><y>492</y><w>56</w><h>56</h></coordinates><panel_attributes>Lightglobe
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1239</x><y>861</y><w>98</w><h>98</h></coordinates><panel_attributes>Lightglobe
 --
 
 
 --
 
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>648</x><y>260</y><w>80</w><h>68</h></coordinates><panel_attributes>Switch
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1134</x><y>455</y><w>140</w><h>119</h></coordinates><panel_attributes>Switch
 --
 -  type: string
 -  voltage: float
@@ -41,7 +41,7 @@
 + duplicate(): Switch
 + fromstring(data: string): Switch
 + isEquals(other: Switch): boolean
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>272</x><y>260</y><w>88</w><h>68</h></coordinates><panel_attributes>Buzzer
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>476</x><y>455</y><w>154</w><h>119</h></coordinates><panel_attributes>Buzzer
 --
 -  voltage: float
 - current: float
@@ -50,14 +50,14 @@
 --
 + duplicate(): Buzzer
 + fromstring(data: string): Buzzer
-+ isEquals(other: Buzzer): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>552</x><y>260</y><w>84</w><h>68</h></coordinates><panel_attributes>Sensor
++ isEquals(other: Buzzer): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>966</x><y>455</y><w>147</w><h>119</h></coordinates><panel_attributes>Sensor
 --
 -  type: string
 - voltage: float
 --
 + duplicate(): Sensor
 + fromstring(data: string): Sensor
-+ isEquals(other: Sensor): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>800</x><y>360</y><w>92</w><h>96</h></coordinates><panel_attributes>/Light/
++ isEquals(other: Sensor): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1400</x><y>630</y><w>161</w><h>168</h></coordinates><panel_attributes>/Light/
 --
 -  colour: string
 -  voltage: float
@@ -70,7 +70,7 @@
 + calculateWattage(): float
 + fromstring(data: string): Light
 + isEquals(other: Light): boolean
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>452</x><y>104</y><w>128</w><h>88</h></coordinates><panel_attributes>/Component/
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>791</x><y>182</y><w>224</w><h>154</h></coordinates><panel_attributes>/Component/
 --
 - name: string
 - price: float
@@ -82,7 +82,7 @@
 + fromString(): Component
 + clone(): Component
 + isEquals(other: Component): boolean
-+ parseCSV(data: string): Component</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>392</x><y>188</y><w>100</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>230;10;230;100;10;100;10;180</additional_attributes></element><element><id>Relation</id><coordinates><x>496</x><y>188</y><w>12</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;180</additional_attributes></element><element><id>Relation</id><coordinates><x>528</x><y>188</y><w>164</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;100;390;100;390;180</additional_attributes></element><element><id>UMLClass</id><coordinates><x>56</x><y>104</y><w>128</w><h>92</h></coordinates><panel_attributes>/CircuitKit/
++ parseCSV(data: string): Component</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>686</x><y>329</y><w>175</w><h>140</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>230;10;230;100;10;100;10;180</additional_attributes></element><element><id>Relation</id><coordinates><x>868</x><y>329</y><w>21</w><h>140</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;180</additional_attributes></element><element><id>Relation</id><coordinates><x>924</x><y>329</y><w>287</w><h>140</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;100;390;100;390;180</additional_attributes></element><element><id>UMLClass</id><coordinates><x>98</x><y>182</y><w>224</w><h>161</h></coordinates><panel_attributes>/CircuitKit/
 --
 - name: string
 - components: List&lt;Component&gt;
@@ -95,7 +95,7 @@
 + getComponentCount(): int
 + hasValidPowerSupply(): boolean
 + isComplete(): boolean
-+ isEquals(other: CircuitKit): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>32</x><y>260</y><w>96</w><h>136</h></coordinates><panel_attributes>LightCircuitKit
++ isEquals(other: CircuitKit): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>56</x><y>455</y><w>168</w><h>238</h></coordinates><panel_attributes>LightCircuitKit
 -
 - batteryCount: int
 - lightCount: int
@@ -116,14 +116,14 @@
 + getUniqueColourCount(): int
 + displaySwitchInfo(): string
 + displayLightInfo(): string
-+ isCompleteAndFunctional(): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>132</x><y>260</y><w>76</w><h>64</h></coordinates><panel_attributes>SensorCircuitKit
++ isCompleteAndFunctional(): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>231</x><y>455</y><w>133</w><h>112</h></coordinates><panel_attributes>SensorCircuitKit
 -
 
 
 -
 + getPowerSupplyType(): string
 + getSensorType(): string
-+ getLightInfo(): string</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>288</x><y>344</y><w>104</w><h>76</h></coordinates><panel_attributes>/Transaction/
++ getLightInfo(): string</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>504</x><y>602</y><w>182</w><h>133</h></coordinates><panel_attributes>/Transaction/
 -
 
 - items: List&lt;Component&gt;
@@ -137,7 +137,7 @@
 + getTotalPrice(): float
 + searchByDate(date): List&lt;Transaction&gt;
 
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>312</x><y>448</y><w>116</w><h>96</h></coordinates><panel_attributes>PurchaseOrder
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>546</x><y>784</y><w>203</w><h>168</h></coordinates><panel_attributes>PurchaseOrder
 -
 - supplierName: string
 - brandName: string
@@ -153,7 +153,7 @@
 + removeItem(item: Component): void
 + getSupplierName(): string
 + setSupplierName(name: String): void
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>512</x><y>376</y><w>108</w><h>84</h></coordinates><panel_attributes>CustomerSale
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>896</x><y>658</y><w>189</w><h>147</h></coordinates><panel_attributes>CustomerSale
 --
 - customerName: string
 - salesTotal: float
@@ -165,22 +165,48 @@
 + addItem(item: Component, quantity: int): void
 + removeItem(item: Component): void
 + getCustomerName(): string
-+ setCustomerName(name: string): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>544</x><y>188</y><w>252</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;70;610;70;610;180</additional_attributes></element><element><id>UMLClass</id><coordinates><x>440</x><y>0</y><w>156</w><h>28</h></coordinates><panel_attributes>Assignment 1 OOP
++ setCustomerName(name: string): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>952</x><y>329</y><w>441</w><h>140</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;70;610;70;610;180</additional_attributes></element><element><id>UMLClass</id><coordinates><x>770</x><y>0</y><w>273</w><h>49</h></coordinates><panel_attributes>Assignment 1 OOP
 522498, 523127, 521560
-This is our Group work</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>560</x><y>188</y><w>292</w><h>180</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;40;710;40;710;430</additional_attributes></element><element><id>Relation</id><coordinates><x>300</x><y>188</y><w>176</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>420;10;420;60;10;60;10;180</additional_attributes></element><element><id>Relation</id><coordinates><x>388</x><y>384</y><w>132</w><h>12</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;310;10</additional_attributes></element><element><id>Relation</id><coordinates><x>512</x><y>188</y><w>88</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;130;200;130;200;180</additional_attributes></element><element><id>Relation</id><coordinates><x>164</x><y>192</y><w>12</w><h>76</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;170</additional_attributes></element><element><id>Relation</id><coordinates><x>180</x><y>124</y><w>280</w><h>20</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+This is our Group work</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>980</x><y>329</y><w>511</w><h>315</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;40;710;40;710;430</additional_attributes></element><element><id>Relation</id><coordinates><x>525</x><y>329</y><w>308</w><h>140</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>420;10;420;60;10;60;10;180</additional_attributes></element><element><id>Relation</id><coordinates><x>679</x><y>672</y><w>231</w><h>21</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;310;10</additional_attributes></element><element><id>Relation</id><coordinates><x>896</x><y>329</y><w>154</w><h>140</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;130;200;130;200;180</additional_attributes></element><element><id>Relation</id><coordinates><x>287</x><y>336</y><w>21</w><h>133</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;170</additional_attributes></element><element><id>Relation</id><coordinates><x>315</x><y>217</y><w>490</w><h>35</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
 m1=1
 m2=1..*
 is part of
-</panel_attributes><additional_attributes>10;20;680;20</additional_attributes></element><element><id>Relation</id><coordinates><x>228</x><y>156</y><w>232</w><h>220</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;-
+</panel_attributes><additional_attributes>10;20;680;20</additional_attributes></element><element><id>Relation</id><coordinates><x>399</x><y>273</y><w>406</w><h>385</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;-
 m1=1
 m2=1..*
 may have
-</panel_attributes><additional_attributes>150;520;10;520;10;10;560;10</additional_attributes></element><element><id>Relation</id><coordinates><x>92</x><y>192</y><w>12</w><h>76</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;170</additional_attributes></element><element><id>Relation</id><coordinates><x>364</x><y>416</y><w>12</w><h>40</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;80</additional_attributes></element><element><id>Relation</id><coordinates><x>728</x><y>452</y><w>112</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>260;10;260;60;10;60;10;100</additional_attributes></element><element><id>Relation</id><coordinates><x>856</x><y>452</y><w>12</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;100</additional_attributes></element><element><id>Relation</id><coordinates><x>8</x><y>68</y><w>916</w><h>324</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+</panel_attributes><additional_attributes>150;520;10;520;10;10;560;10</additional_attributes></element><element><id>Relation</id><coordinates><x>161</x><y>336</y><w>21</w><h>133</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;170</additional_attributes></element><element><id>Relation</id><coordinates><x>637</x><y>728</y><w>21</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;80</additional_attributes></element><element><id>Relation</id><coordinates><x>1274</x><y>791</y><w>196</w><h>84</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>260;10;260;60;10;60;10;100</additional_attributes></element><element><id>Relation</id><coordinates><x>1498</x><y>791</y><w>21</w><h>84</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;100</additional_attributes></element><element><id>Relation</id><coordinates><x>14</x><y>119</y><w>1603</w><h>567</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
 must have
-m2=1..*</panel_attributes><additional_attributes>60;520;10;520;10;20;2270;20;2270;780;2210;780</additional_attributes></element><element><id>Relation</id><coordinates><x>124</x><y>324</y><w>548</w><h>284</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=1..*</panel_attributes><additional_attributes>60;520;10;520;10;20;2270;20;2270;780;2210;780</additional_attributes></element><element><id>Relation</id><coordinates><x>217</x><y>567</y><w>959</w><h>497</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
 m2=1..*
 must have
-</panel_attributes><additional_attributes>10;100;90;100;90;680;1350;680;1350;60;1010;60;1010;10</additional_attributes></element><element><id>Relation</id><coordinates><x>0</x><y>324</y><w>704</w><h>308</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+</panel_attributes><additional_attributes>10;100;90;100;90;680;1350;680;1350;60;1010;60;1010;10</additional_attributes></element><element><id>Relation</id><coordinates><x>0</x><y>567</y><w>1232</w><h>539</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
 m2=1..*
 must have
-</panel_attributes><additional_attributes>80;120;10;120;10;740;1720;740;1720;10</additional_attributes></element></diagram>
+</panel_attributes><additional_attributes>80;120;10;120;10;740;1720;740;1720;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1673</x><y>315</y><w>196</w><h>154</h></coordinates><panel_attributes>App
+-
+- __components: List&lt;Component&gt;
+- __circuits: List&lt;CircuitKit&gt;
+- __transactions: List&lt;Transaction&gt;
+- __menu: Menu
+
+-
++ load_files() : None
++ save_files() : None
++ run() : None
++ add_component(c: Component) : None
++ add_circuit(c: CircuitKit) : None
++ add_transaction(t: Transaction) : None</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1638</x><y>539</y><w>161</w><h>133</h></coordinates><panel_attributes>Menu
+-
+- __title: str
+- __options: Dict&lt;int, Callable&gt;
+
+-
++ display() : None
++ get_choice() : int</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1660</x><y>731</y><w>182</w><h>91</h></coordinates><panel_attributes>/PowerSupply/
+-
+
+-
++ duplicate() : PowerSupply
++ from_string(data: str) : PowerSupply
+</panel_attributes><additional_attributes></additional_attributes></element></diagram>
