@@ -5,7 +5,7 @@ class CircuitKit:
     def __init__(self, name: str, price: float = 0.0) -> None:
         self.name = name
         self.price = price
-        self.components: List[Component] = []
+        self.components: List[Component] = [] # type: ignore
 
     def addComponent(self, component: Component) -> None:
         self.components.append(component)

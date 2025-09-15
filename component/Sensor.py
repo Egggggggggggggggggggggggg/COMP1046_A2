@@ -1,28 +1,39 @@
-from component.InputComponent import InputComponent
+#Academic Integrity Statement
+#Author: Pratik Sapkota
+#Student ID: 522498
+#Email: 522498@learning.eynesbury.edu.au
+#Description: Sensor class definition
+#This is my own work as defined by the Academic Integrity Policy.
+
 from component.Component import Component
 
-class Sensor(InputComponent):
+class Sensor(Component):
     def __init__(self, sensor_type: str, voltage: float, price: float) -> None:
-        super().__init__("Sensor", voltage, price)
+        super().__init__("Sensor", price)
         self.__sensor_type = sensor_type
+        self.__voltage = voltage
 
     @property
     def sensor_type(self) -> str:
         return self.__sensor_type
 
+    @property
+    def voltage(self) -> float:
+        return self.__voltage
+
+    def showDetails(self) -> str:
+        return self.toString()
+
     def duplicate(self) -> "Sensor":
         return Sensor(self.sensor_type, self.voltage, self.price)
 
     @classmethod
-    def from_string(cls, data: str) -> "Sensor":
+    def fromString(cls, data: str) -> "Sensor":
         parts = data.split(",")
         return cls(parts[0], float(parts[1]), float(parts[2]))
 
-    def to_csv(self) -> str:
+    def toCSV(self) -> str:
         return self.sensor_type + "," + str(self.voltage) + "," + str(self.price)
 
-    def to_string(self) -> str:
-        return str(self.voltage) + "V " + self.sensor_type + " Sensor $" + str(self.price)
-
-    def is_equals(self, other: "Component") -> bool:
-        return isinstance(other, Sensor) and self.sensor_type == other.sensor_type and self.voltage == other.voltage
+    def toString(self) -> str:
+        return str(self.voltage) + "V " + self.sensor_type.capitalize() + " Sensor $" + str(self.price)

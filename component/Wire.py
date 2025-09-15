@@ -1,27 +1,55 @@
+# Academic Integrity Statment
+# Filename: Wire.py
+# Author: Botao Huang
+# Student ID: 521560
+# Email: 521560@learning.eynesbury.edu.au
+# Date: 15 SEP 2025
+# Description: Wire class
+# This is my own work as defined by the Academic Integrity Policy
+
 from component.Component import Component
 
 class Wire(Component):
-    def __init__(self, name: str, price: float, length: float) -> None:
+    def __init__(self, name: str, price: float, length: float, colour: str) -> None:
         super().__init__(name, price)
-        self.length = length
+        self.length = float(length)
+        self.colour = colour
 
     def showDetails(self) -> str:
-        return "Wire(" + self.name + ", $" + format(self.price, ".2f") + ", " + str(self.length) + "cm)"
+        base = super().showDetails()[:-1]
+        return base + ", " + format(self.length, ".2f") + "cm, " + self.colour + ")"
 
     def toCSV(self) -> str:
-        return "Wire," + self.name + "," + format(self.price, ".2f") + "," + str(self.length)
+        return ",".join([
+            "Wire",
+            self.name,
+            format(self.price, ".2f"),
+            format(self.length, ".2f"),
+            self.colour
+        ])
 
     def fromString(self, s: str) -> "Wire":
-        parts = s.strip().split(",")
-        if len(parts) != 4 or parts[0] != "Wire":
+        parts = [p.strip() for p in s.split(",")]
+        if len(parts) == 5 and parts[0] == "Wire":
+            self.name = parts[1]
+            self.price = float(parts[2])
+            self.length = float(parts[3])
+            self.colour = parts[4]
+        elif len(parts) == 4:
+            self.name = parts[0]
+            self.price = float(parts[1])
+            self.length = float(parts[2])
+            self.colour = parts[3]
+        else:
             raise ValueError("Invalid Wire string: " + s)
-        return Wire(parts[1], float(parts[2]), float(parts[3]))
+        return self
 
     def duplicate(self) -> "Wire":
-        return Wire(self.name, self.price, self.length)
+        return Wire(self.name, self.price, self.length, self.colour)
 
     def isEqual(self, other: "Wire") -> bool:
         return isinstance(other, Wire) and \
                self.name == other.name and \
                self.price == other.price and \
-               self.length == other.length
+               self.length == other.length and \
+               self.colour == other.colour
