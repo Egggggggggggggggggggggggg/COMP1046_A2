@@ -9,13 +9,13 @@ class Component:
         return "".join([cls, "(", self.name, ", ", price_str, ")"])
 
     def toCSV(self) -> str:
-        return ""
+        return ",".join([self.__class__.__name__, self.name, format(self.price, ".2f")])
 
     def fromString(self, s: str) -> "Component":
         return self
 
     def duplicate(self) -> "Component":
-        return self
+        return (self.name, self.price)
 
     def isEqual(self, other: "Component") -> bool:
         return isinstance(other, Component) and self.name == other.name
