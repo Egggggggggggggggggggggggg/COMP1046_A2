@@ -181,11 +181,11 @@ must have
 </panel_attributes><additional_attributes>10;100;90;100;90;680;1350;680;1350;60;1010;60;1010;10</additional_attributes></element><element><id>Relation</id><coordinates><x>0</x><y>648</y><w>1408</w><h>616</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
 m2=1..*
 must have
-</panel_attributes><additional_attributes>80;120;10;120;10;740;1720;740;1720;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2120</x><y>376</y><w>224</w><h>176</h></coordinates><panel_attributes>App
+</panel_attributes><additional_attributes>80;120;10;120;10;740;1720;740;1720;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2128</x><y>440</y><w>224</w><h>176</h></coordinates><panel_attributes>App
 -
 
 -
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2152</x><y>648</y><w>184</w><h>152</h></coordinates><panel_attributes>Menu
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2128</x><y>632</y><w>184</w><h>152</h></coordinates><panel_attributes>Menu
 -
 - __title: str
 - __options: Dict&lt;int, Callable&gt;

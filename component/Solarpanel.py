@@ -14,15 +14,15 @@ class Solarpanel(PowerSupply):
         return Solarpanel(self.voltage, self.current, self.price)
 
     @classmethod
-    def from_string(cls, data: str) -> "Solarpanel":
+    def fromString(cls, data: str) -> "Solarpanel":
         parts = data.split(",")
         return cls(float(parts[0]), float(parts[1]), float(parts[2]))
 
-    def to_csv(self) -> str:
+    def toCSV(self) -> str:
         return str(self.voltage) + "," + str(self.current) + "," + str(self.price)
 
-    def to_string(self) -> str:
+    def toString(self) -> str:
         return str(self.voltage) + "V " + str(self.current) + "mA Solar Panel $" + str(self.price)
 
-    def is_equals(self, other: "Component") -> bool:
+    def isEquals(self, other: "Component") -> bool:
         return isinstance(other, Solarpanel) and self.voltage == other.voltage and self.current == other.current
