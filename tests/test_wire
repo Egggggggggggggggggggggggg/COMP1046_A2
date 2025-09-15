@@ -3,14 +3,18 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from component.Wire import Wire
 
-w1 = Wire("CopperWire", 0.50, 100.0)
+w1 = Wire("CopperWire", 0.50, 100, "red")
 print(w1.showDetails())
+# Wire(CopperWire, $0.50, 100.00cm, red)
+
 print(w1.toCSV())
+# Wire,CopperWire,0.50,100.00,red
 
-csv_str = "Wire,CopperWire,0.50,100.0"
-w2 = w1.fromString(csv_str)
+csv_str = "Wire,CopperWire,0.50,100.00,red"
+w2 = Wire("", 0, 0, "").fromString(csv_str)
 print(w2.showDetails())
+# Wire(CopperWire, $0.50, 100.00cm, red)
 
-print(w1.isEqual(w2))
-w3 = w1.duplicate()
-print(w3.showDetails())
+print(w1.isEqual(w2))   # True
+print(w1.duplicate().showDetails())
+
