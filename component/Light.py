@@ -16,5 +16,25 @@ class Light(Component):
     def toCSV(self) -> str:
         return ",".join(["Light", self.name, format(self.price, ".2f"), self.colour, format(self.voltage, ".2f"), format(self.current, ".2f")])
 
+    def fromString(self, s: str) -> "Light":
+        parts = [p.strip() for p in s.split(",")]
+        if len(parts) == 6:
+            self.name = parts[1]
+            self.price = float(parts[2])
+            self.colour = parts[3]
+            self.voltage = float(parts[4])
+            self.current = float(parts[5])
+        elif len(parts) == 5:
+            self.name = parts[0]
+            self.price = float(parts[1])
+            self.colour = parts[2]
+            self.voltage = float(parts[3])
+            self.current = float(parts[4])
+        return self
+
+    def duplicate(self) -> "Light":
+        return Light(self.name, self.price, self.colour, self.voltage, self.current)
+
     def calculateWasted(self) -> float:
+        #
         return 0.0
