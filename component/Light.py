@@ -1,4 +1,4 @@
-from Component import Component
+from component.Component import Component
 
 class Light(Component):
     def __init__(self, name: str, price: float, colour: str = "", voltage: float = 0.0, current: float = 0.0) -> None:
@@ -46,5 +46,4 @@ class Light(Component):
         self.colour == other.colour and \
         self.voltage == other.voltage and \
         self.current == other.current
-    
     

@@ -1,4 +1,4 @@
-from Light import Light
+from component.Light import Light
 
 class Lightglobe(Light):
     pass
