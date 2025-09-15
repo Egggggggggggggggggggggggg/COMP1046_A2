@@ -1,10 +1,3 @@
-#Academic Integrity Statement
-#Author: Pratik Sapkota
-#Student ID: 522498
-#Email: 522498@learning.eynesbury.edu.au
-#Description: Battery class definition
-#This is my own work as defined by the Academic Integrity Policy.
-
 from component.Component import Component
 
 class Battery(Component):
@@ -13,8 +6,34 @@ class Battery(Component):
         self._voltage = float(voltage)
 
     @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, value: str) -> None:
+        if not value:
+            raise ValueError("Battery name cannot be empty")
+        self._name = value
+
+    @property
+    def price(self) -> float:
+        return self._price
+
+    @price.setter
+    def price(self, value: float) -> None:
+        if value < 0:
+            raise ValueError("Battery price cannot be negative")
+        self._price = float(value)
+
+    @property
     def voltage(self) -> float:
         return self._voltage
+
+    @voltage.setter
+    def voltage(self, value: float) -> None:
+        if value <= 0:
+            raise ValueError("Battery voltage must be positive")
+        self._voltage = float(value)
 
     def showDetails(self) -> str:
         return "Battery(" + self.name + ", $" + format(self.price, ".2f") + ", " + format(self.voltage, ".2f") + "V)"
