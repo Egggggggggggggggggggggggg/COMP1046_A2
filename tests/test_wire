@@ -1,0 +1,16 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+from component.Wire import Wire
+
+w1 = Wire("CopperWire", 0.50, 100.0)
+print(w1.showDetails())
+print(w1.toCSV())
+
+csv_str = "Wire,CopperWire,0.50,100.0"
+w2 = w1.fromString(csv_str)
+print(w2.showDetails())
+
+print(w1.isEqual(w2))
+w3 = w1.duplicate()
+print(w3.showDetails())
