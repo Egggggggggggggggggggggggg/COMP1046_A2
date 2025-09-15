@@ -1,0 +1,186 @@
+<diagram program="umletino" version="15.1"><zoom_level>4</zoom_level><help_text></help_text><element><id>UMLClass</id><coordinates><x>372</x><y>260</y><w>76</w><h>68</h></coordinates><panel_attributes>Wire
+--
+-  length: float
+
+
+--
++ duplicate(): wire
++ fromstring(data: string): Wire
++ isEquals(other: Wire): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>460</x><y>260</y><w>80</w><h>68</h></coordinates><panel_attributes>Battery
+--
+-  size: string
+-  voltage: float
+--
++ duplicate(): Battery
++ fromstring(data: string): Battery
++ isEquals(Other: Battery): Battery</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>740</x><y>260</y><w>92</w><h>68</h></coordinates><panel_attributes>Solarpanel
+--
+-  voltage: float
+-  current: float
+--
++ duplicate(): SolarPanel
++ fromstring(data: string): Solarpanel
++ isEqulas(other: Solarpanel): boolean
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>832</x><y>492</y><w>60</w><h>56</h></coordinates><panel_attributes>LED
+--
+
+
+--
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>708</x><y>492</y><w>56</w><h>56</h></coordinates><panel_attributes>Lightglobe
+--
+
+
+--
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>648</x><y>260</y><w>80</w><h>68</h></coordinates><panel_attributes>Switch
+--
+-  type: string
+-  voltage: float
+--
++ duplicate(): Switch
++ fromstring(data: string): Switch
++ isEquals(other: Switch): boolean
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>272</x><y>260</y><w>88</w><h>68</h></coordinates><panel_attributes>Buzzer
+--
+-  voltage: float
+- current: float
+-  frequency: float
+-  soundPressure: float
+--
++ duplicate(): Buzzer
++ fromstring(data: string): Buzzer
++ isEquals(other: Buzzer): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>552</x><y>260</y><w>84</w><h>68</h></coordinates><panel_attributes>Sensor
+--
+-  type: string
+- voltage: float
+--
++ duplicate(): Sensor
++ fromstring(data: string): Sensor
++ isEquals(other: Sensor): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>800</x><y>360</y><w>92</w><h>96</h></coordinates><panel_attributes>/Light/
+--
+-  colour: string
+-  voltage: float
+-  current: float
+-  price: float
+-  name: string
+
+--
++ duplicate(): Light
++ calculateWattage(): float
++ fromstring(data: string): Light
++ isEquals(other: Light): boolean
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>452</x><y>104</y><w>128</w><h>88</h></coordinates><panel_attributes>/Component/
+--
+- name: string
+- price: float
+
+--
++ showDetail(): string
++ toCSV(): string
++ toString(): string
++ fromString(): Component
++ clone(): Component
++ isEquals(other: Component): boolean
++ parseCSV(data: string): Component</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>392</x><y>188</y><w>100</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>230;10;230;100;10;100;10;180</additional_attributes></element><element><id>Relation</id><coordinates><x>496</x><y>188</y><w>12</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;180</additional_attributes></element><element><id>Relation</id><coordinates><x>528</x><y>188</y><w>164</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;100;390;100;390;180</additional_attributes></element><element><id>UMLClass</id><coordinates><x>56</x><y>104</y><w>128</w><h>92</h></coordinates><panel_attributes>/CircuitKit/
+--
+- name: string
+- components: List&lt;Component&gt;
+- price: float
+- componentsCount: int
+--
++ addComponent(Component): void
++ removeComponent(Component): void
++ getTotalPrice(): float
++ getComponentCount(): int
++ hasValidPowerSupply(): boolean
++ isComplete(): boolean
++ isEquals(other: CircuitKit): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>32</x><y>260</y><w>96</w><h>136</h></coordinates><panel_attributes>LightCircuitKit
+-
+- batteryCount: int
+- lightCount: int
+- lightType: string
+- lightColours: List&lt;string&gt;
+- switchCount: int
+- switchType: string
+- uniqueColourCount: int
+
+--
++ checkHasBattery(): boolean
++ checkHasLight(): boolean
++ checkLightTypeConsistency(): boolean
++ checkLightColourRule(): boolean
++ checkHasSwitch(): boolean
++ checkNoSensor(): boolean
++ checkWireCount(): boolean
++ getUniqueColourCount(): int
++ displaySwitchInfo(): string
++ displayLightInfo(): string
++ isCompleteAndFunctional(): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>132</x><y>260</y><w>76</w><h>64</h></coordinates><panel_attributes>SensorCircuitKit
+-
+
+
+-
++ getPowerSupplyType(): string
++ getSensorType(): string
++ getLightInfo(): string</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>288</x><y>344</y><w>104</w><h>76</h></coordinates><panel_attributes>/Transaction/
+-
+
+- items: List&lt;Component&gt;
+- dateTime: Date
+
+-
++ addItem(Component): void
++ removeItem(Component): void
++ cancel(): void
++ confirm(): void
++ getTotalPrice(): float
++ searchByDate(date): List&lt;Transaction&gt;
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>312</x><y>448</y><w>116</w><h>96</h></coordinates><panel_attributes>PurchaseOrder
+-
+- supplierName: string
+- brandName: string
+- salesTotal: float
+- isPurchased: boolean
+
+--
++ calculateSalesTotal(): float
++ validateSingleBrand(): boolean
++ completeOrder(): void
++ cancelOrder(): void
++ addItem(item: Component, quantity: int): void
++ removeItem(item: Component): void
++ getSupplierName(): string
++ setSupplierName(name: String): void
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>512</x><y>376</y><w>108</w><h>84</h></coordinates><panel_attributes>CustomerSale
+--
+- customerName: string
+- salesTotal: float
+- isCompleted: boolean
+--
++ calculateSalesTotal(): float
++ completeOrder(): void
++ cancelOrder(): void
++ addItem(item: Component, quantity: int): void
++ removeItem(item: Component): void
++ getCustomerName(): string
++ setCustomerName(name: string): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>544</x><y>188</y><w>252</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;70;610;70;610;180</additional_attributes></element><element><id>UMLClass</id><coordinates><x>440</x><y>0</y><w>156</w><h>28</h></coordinates><panel_attributes>Assignment 1 OOP
+522498, 523127, 521560
+This is our Group work</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>560</x><y>188</y><w>292</w><h>180</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;40;710;40;710;430</additional_attributes></element><element><id>Relation</id><coordinates><x>300</x><y>188</y><w>176</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>420;10;420;60;10;60;10;180</additional_attributes></element><element><id>Relation</id><coordinates><x>388</x><y>384</y><w>132</w><h>12</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;310;10</additional_attributes></element><element><id>Relation</id><coordinates><x>512</x><y>188</y><w>88</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;130;200;130;200;180</additional_attributes></element><element><id>Relation</id><coordinates><x>164</x><y>192</y><w>12</w><h>76</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;170</additional_attributes></element><element><id>Relation</id><coordinates><x>180</x><y>124</y><w>280</w><h>20</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m1=1
+m2=1..*
+is part of
+</panel_attributes><additional_attributes>10;20;680;20</additional_attributes></element><element><id>Relation</id><coordinates><x>228</x><y>156</y><w>232</w><h>220</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m1=1
+m2=1..*
+may have
+</panel_attributes><additional_attributes>150;520;10;520;10;10;560;10</additional_attributes></element><element><id>Relation</id><coordinates><x>92</x><y>192</y><w>12</w><h>76</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;170</additional_attributes></element><element><id>Relation</id><coordinates><x>364</x><y>416</y><w>12</w><h>40</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;80</additional_attributes></element><element><id>Relation</id><coordinates><x>728</x><y>452</y><w>112</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>260;10;260;60;10;60;10;100</additional_attributes></element><element><id>Relation</id><coordinates><x>856</x><y>452</y><w>12</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;100</additional_attributes></element><element><id>Relation</id><coordinates><x>8</x><y>68</y><w>916</w><h>324</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+must have
+m2=1..*</panel_attributes><additional_attributes>60;520;10;520;10;20;2270;20;2270;780;2210;780</additional_attributes></element><element><id>Relation</id><coordinates><x>124</x><y>324</y><w>548</w><h>284</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=1..*
+must have
+</panel_attributes><additional_attributes>10;100;90;100;90;680;1350;680;1350;60;1010;60;1010;10</additional_attributes></element><element><id>Relation</id><coordinates><x>0</x><y>324</y><w>704</w><h>308</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=1..*
+must have
+</panel_attributes><additional_attributes>80;120;10;120;10;740;1720;740;1720;10</additional_attributes></element></diagram>
