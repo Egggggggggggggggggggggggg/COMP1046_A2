@@ -7,7 +7,7 @@ class CustomerSale:
         self.saleTotal: float = 0.0
         self.isComplete: bool = False
         self._items: Dict[Component, int] = {}  # {Component: quantity}
-
+aa
     def addItem(self, component: Component, quantity: int) -> None:
         self._items[component] = self._items.get(component, 0) + quantity
 
