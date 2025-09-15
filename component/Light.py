@@ -7,5 +7,14 @@ class Light(Component):
         self.current = float(current)
         self.voltage = float(voltage)
 
+    def showDetails(self):
+        head = super().showDetails()[:-1]
+        volt = format(self.voltage, ".2f") + "V"
+        curr = format(self.current, ".2f") + "A"
+        return ", ".join([head, self.colour, volt, curr]) + ")"
+    
+    def toCSV(self) -> str:
+        return ",".join(["Light", self.name, format(self.price, ".2f"), self.colour, format(self.voltage, ".2f"), format(self.current, ".2f")])
+
     def calculateWasted(self) -> float:
         return 0.0
