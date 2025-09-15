@@ -1,7 +1,7 @@
 <diagram program="umletino" version="15.1"><zoom_level>8</zoom_level><help_text></help_text><element><id>UMLClass</id><coordinates><x>744</x><y>520</y><w>152</w><h>136</h></coordinates><panel_attributes>Wire
 --
 -  length: float
-
+- colour: str
 
 --
 + duplicate(): wire
