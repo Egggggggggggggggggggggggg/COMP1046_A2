@@ -4,12 +4,14 @@ class Menu:
 
     def main(self) -> None:
         while True:
-            print("\n=== Main Menu ===")
-            print("1) Components")
-            print("2) Circuits")
-            print("3) Transactions")
-            print("4) Exit")
-            choice = input("Select: ").strip()
+            print("\nHOME MENU")
+            print("1. COMPONENTS")
+            print("2. CIRCUIT KITS")
+            print("3. PURCHASE ORDERS")
+            print("4. CUSTOMER SALES")
+            print("5. TRANSACTION HISTORY")
+            print("6. CLOSE")
+            choice = input("Please enter a number: ").strip()
             if choice == "1":
                 self._components_menu()
             elif choice == "2":
