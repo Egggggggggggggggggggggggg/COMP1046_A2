@@ -1,3 +1,10 @@
+#Academic Integrity Statement
+#Author: Pratik Sapkota
+#Student ID: 522498
+#Email: 522498@learning.eynesbury.edu.au
+#Description: LightCircuitKit class definition
+#This is my own work as defined by the Academic Integrity Policy.
+
 from circuitkit.CircuitKit import CircuitKit
 
 class LightCircuitKit(CircuitKit):
