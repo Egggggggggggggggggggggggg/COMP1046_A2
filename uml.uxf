@@ -78,7 +78,7 @@
 - price: float
 
 --
-+ duplicate() : Component   (abstract)
++ duplicate() : Component  (abstract)
 + from_string(data: str) : Component (abstract)
 + to_csv() : str            (abstract)
 + to_string() : str         (abstract)
@@ -183,7 +183,7 @@ must have
 </panel_attributes><additional_attributes>10;100;90;100;90;680;1350;680;1350;60;1010;60;1010;10</additional_attributes></element><element><id>Relation</id><coordinates><x>0</x><y>486</y><w>1056</w><h>462</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
 m2=1..*
 must have
-</panel_attributes><additional_attributes>80;120;10;120;10;740;1720;740;1720;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1434</x><y>270</y><w>168</w><h>132</h></coordinates><panel_attributes>App
+</panel_attributes><additional_attributes>80;120;10;120;10;740;1720;740;1720;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1590</x><y>282</y><w>168</w><h>132</h></coordinates><panel_attributes>App
 -
 - __components: List&lt;Component&gt;
 - __circuits: List&lt;CircuitKit&gt;
@@ -196,26 +196,26 @@ must have
 + run() : None
 + add_component(c: Component) : None
 + add_circuit(c: CircuitKit) : None
-+ add_transaction(t: Transaction) : None</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1404</x><y>462</y><w>138</w><h>114</h></coordinates><panel_attributes>Menu
++ add_transaction(t: Transaction) : None</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1614</x><y>486</y><w>138</w><h>114</h></coordinates><panel_attributes>Menu
 -
 - __title: str
 - __options: Dict&lt;int, Callable&gt;
 
 -
 + display() : None
-+ get_choice() : int</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1422</x><y>624</y><w>156</w><h>78</h></coordinates><panel_attributes>/PowerSupply/
++ get_choice() : int</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1416</x><y>528</y><w>156</w><h>78</h></coordinates><panel_attributes>/PowerSupply/
 -
 
 -
 + duplicate() : PowerSupply
 + from_string(data: str) : PowerSupply
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1410</x><y>726</y><w>156</w><h>78</h></coordinates><panel_attributes>/InputComponent/
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1812</x><y>528</y><w>156</w><h>78</h></coordinates><panel_attributes>/InputComponent/
 -
 
 -
 + duplicate() : InputComponent
 + from_string(data: str) : InputComponent
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1410</x><y>816</y><w>156</w><h>78</h></coordinates><panel_attributes>/OutputComponent/
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1608</x><y>684</y><w>156</w><h>72</h></coordinates><panel_attributes>/OutputComponent/
 -
 
 -
