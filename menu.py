@@ -2,6 +2,7 @@ class Menu:
     def __init__(self, app: "App") -> None:
         self.app = app
 
+
     def _show_menu(self, title: str, options: list[tuple[str, callable]]) -> None:
         while True:
             print("\n" + title)
@@ -17,9 +18,10 @@ class Menu:
                     return
                 action()
             except ValueError:
-                print(f"Wrong input, must be a number between 1 and {len(options)}")
+                print("Wrong input, must be a number between 1 and", str(len(options)))
             except Exception as e:
                 print("Error:", e)
+
 
     # ============= Menu =============
 
@@ -34,6 +36,7 @@ class Menu:
         ]
         self._show_menu("HOME MENU", options)
 
+
     def _components_menu(self) -> None:
         options = [
             ("NEW COMPONENT", self._new_component_menu),
@@ -41,6 +44,7 @@ class Menu:
             ("BACK", None)
         ]
         self._show_menu("COMPONENT MENU", options)
+
 
     def _new_component_menu(self) -> None:
         options = [
@@ -55,6 +59,7 @@ class Menu:
             ("BACK", None)
         ]
         self._show_menu("NEW COMPONENT MENU", options)
+
 
     def _circuits_menu(self) -> None:
         print("[Circuits Menu TODO]")
