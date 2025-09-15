@@ -1,3 +1,10 @@
+#Academic Integrity Statement
+#Author: Pratik Sapkota
+#Student ID: 522498
+#Email: 522498@learning.eynesbury.edu.au
+#Description: Battery class definition
+#This is my own work as defined by the Academic Integrity Policy.
+
 from component.Component import Component
 
 class Battery(Component):
