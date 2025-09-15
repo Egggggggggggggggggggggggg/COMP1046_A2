@@ -1,7 +1,7 @@
 from typing import List
 from component.Component import Component
 
-class Circuit:
+class CircuitKit:
     def __init__(self, name: str, price: float = 0.0) -> None:
         self.name = name
         self.price = price
@@ -17,5 +17,5 @@ class Circuit:
     def getComponentCount(self) -> int:
         return len(self.components)
 
-    def isEqual(self, other: "Circuit") -> bool:
-        return isinstance(other, Circuit) and self.name == other.name
+    def isEqual(self, other: "CircuitKit") -> bool:
+        return isinstance(other, CircuitKit) and self.name == other.name
