@@ -69,4 +69,4 @@ class Menu:
         print("[Transactions Menu TODO]")
 
     def _view_components(self) -> None:
-        print("[View Components TODO]")
+        print("[View Components TODO.]")
