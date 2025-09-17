@@ -1,5 +1,10 @@
-from typing import Callable, Optional, List
+from typing import Callable, Optional, List, Tuple
 from app import App
+
+from component.Component import Component
+from component.Light import Light
+from component.Battery import Battery
+from component.Buzzer import Buzzer
 
 class Menu:
     def __init__(self, title: str, options: List[tuple[str, Optional[Callable[[], None]]]], prompt: str = "Please enter a number: ") -> None:
@@ -37,7 +42,6 @@ class UI:
     def __init__(self, app: App) -> None:
         self.app = app
 
-    #       INPUT HELPERS
     def _input_int(self, prompt: str, min_val: Optional[int] = None, max_val: Optional[int] = None) -> int:
         s = input(prompt).strip()
         v = int(s)
@@ -59,7 +63,7 @@ class UI:
     def _title_case(self, text: str) -> str:
         return text[:1].upper() + text[1:].lower() if text else text
 
-    #       HOME MENU
+    #       HOME
     def home(self) -> None:
         Menu("HOME MENU", [
             ("COMPONENTS", self.components_menu),
@@ -92,13 +96,13 @@ class UI:
             ("BACK", None),
         ]).run()
 
-
     def create_wire(self) -> None:
         print("NEW WIRE")
         length_mm = self._input_float("Please enter length (mm): ", min_val=0.001)
         price = self._input_float("Please enter price: ", min_val=0.0)
         qty = self._input_int("Please enter number of Wires: ", min_val=1)
-        self.app.add_circuitkit_row([str(qty), "Wire", format(length_mm, ".0f"), format(price, ".2f")])
+        comp = Component(str(int(length_mm)) + "mm Wire", price)
+        self.app.add_circuitkit_object(qty, comp)
         print("Added " + format(length_mm, ".0f") + "mm Wire $" + format(price, ".2f") + " X " + str(qty))
 
     def create_battery(self) -> None:
@@ -118,7 +122,8 @@ class UI:
             voltage = self._input_float("Please enter a voltage that matches the battery size: ", min_val=0.0)
         price = self._input_float("Please enter price: ", min_val=0.0)
         qty = self._input_int("Please enter number of Batteries: ", min_val=1)
-        self.app.add_circuitkit_row([str(qty), "Battery", size, format(voltage, ".1f"), format(price, ".2f")])
+        comp = Battery(size + " Battery", price, voltage)
+        self.app.add_circuitkit_object(qty, comp)
         print("Added " + format(voltage, ".1f") + "V " + size + " Battery $" + format(price, ".2f") + " X " + str(qty))
 
     def create_solar_panel(self) -> None:
@@ -126,11 +131,12 @@ class UI:
         print("Voltage is usually between 1 and 12")
         voltage = self._input_float("Please enter voltage (V): ", min_val=0.0001)
         print("Current is usually between 100 and 1000 milliAmps")
-        current_ma = self._input_float("Please enter current (mA): ", min_val=0.0001)
+        current_mA = self._input_float("Please enter current (mA): ", min_val=0.0001)
         price = self._input_float("Please enter price: ", min_val=0.0)
         qty = self._input_int("Please enter number of Solar Panels: ", min_val=1)
-        self.app.add_circuitkit_row([str(qty), "Solar Panel", format(voltage, ".1f"), format(current_ma / 1000.0, ".1f"), format(price, ".2f")])
-        print("Added " + format(voltage, ".1f") + "V " + format(current_ma, ".1f") + "mA Solar Panel $" + format(price, ".2f") + " X " + str(qty))
+        comp = Light("Solar Panel", price, "", voltage, current_mA / 1000.0)
+        self.app.add_circuitkit_object(qty, comp)
+        print("Added " + format(voltage, ".1f") + "V " + format(current_mA, ".1f") + "mA Solar Panel $" + format(price, ".2f") + " X " + str(qty))
 
     def create_light_globe(self) -> None:
         print("NEW LIGHT GLOBE")
@@ -144,12 +150,13 @@ class UI:
         print("Voltage is usually between 1 and 12")
         voltage = self._input_float("Please enter voltage (V): ", min_val=0.0001)
         print("Current is usually between 100 and 1000 milliAmps")
-        current_ma = self._input_float("Please enter current (mA): ", min_val=0.0001)
+        current_mA = self._input_float("Please enter current (mA): ", min_val=0.0001)
         price = self._input_float("Please enter price: ", min_val=0.0)
         qty = self._input_int("Please enter number of Light Globes: ", min_val=1)
-        self.app.add_circuitkit_row([str(qty), "Light Globe", colour, format(voltage, ".1f"), format(current_ma, ".0f"), format(price, ".2f")])
-        label = colour[:1].upper() + colour[1:].lower()
-        print("Added " + format(voltage, ".1f") + "V " + format(current_ma, ".1f") + "mA " + label + " Light Globe $" + format(price, ".2f") + " X " + str(qty))
+        comp = Light("Light Globe", price, colour, voltage, current_mA / 1000.0)
+        self.app.add_circuitkit_object(qty, comp)
+        label = self._title_case(colour)
+        print("Added " + format(voltage, ".1f") + "V " + format(current_mA, ".1f") + "mA " + label + " Light Globe $" + format(price, ".2f") + " X " + str(qty))
 
     def create_led_light(self) -> None:
         print("NEW LED LIGHT")
@@ -163,12 +170,13 @@ class UI:
         print("Voltage is usually between 1 and 12")
         voltage = self._input_float("Please enter voltage (V): ", min_val=0.0001)
         print("Current is usually between 100 and 1000 milliAmps")
-        current_ma = self._input_float("Please enter current (mA): ", min_val=0.0001)
+        current_mA = self._input_float("Please enter current (mA): ", min_val=0.0001)
         price = self._input_float("Please enter price: ", min_val=0.0)
         qty = self._input_int("Please enter number of LED Lights: ", min_val=1)
-        self.app.add_circuitkit_row([str(qty), "LED Light", colour, format(voltage, ".1f"), format(current_ma, ".0f"), format(price, ".2f")])
-        label = colour[:1].upper() + colour[1:].lower()
-        print("Added " + format(voltage, ".1f") + "V " + format(current_ma, ".1f") + "mA " + label + " LED Light $" + format(price, ".2f") + " X " + str(qty))
+        comp = Light("LED Light", price, colour, voltage, current_mA / 1000.0)
+        self.app.add_circuitkit_object(qty, comp)
+        label = self._title_case(colour)
+        print("Added " + format(voltage, ".1f") + "V " + format(current_mA, ".1f") + "mA " + label + " LED Light $" + format(price, ".2f") + " X " + str(qty))
 
     def create_switch(self) -> None:
         print("NEW SWITCH")
@@ -183,7 +191,8 @@ class UI:
         voltage = self._input_float("Please enter voltage (V): ", min_val=0.0001)
         price = self._input_float("Please enter price: ", min_val=0.0)
         qty = self._input_int("Please enter number of Switches: ", min_val=1)
-        self.app.add_circuitkit_row([str(qty), "Switch", swtype, format(voltage, ".1f"), format(price, ".2f")])
+        comp = Component(self._title_case(swtype) + " Switch", price)
+        self.app.add_circuitkit_object(qty, comp)
         print("Added " + format(voltage, ".1f") + "V " + self._title_case(swtype) + " Switch $" + format(price, ".2f") + " X " + str(qty))
 
     def create_sensor(self) -> None:
@@ -199,7 +208,8 @@ class UI:
         voltage = self._input_float("Please enter voltage (V): ", min_val=0.0001)
         price = self._input_float("Please enter price: ", min_val=0.0)
         qty = self._input_int("Please enter number of Sensors: ", min_val=1)
-        self.app.add_circuitkit_row([str(qty), "Sensor", stype, format(voltage, ".1f"), format(price, ".2f")])
+        comp = Component(self._title_case(stype) + " Sensor", price)
+        self.app.add_circuitkit_object(qty, comp)
         print("Added " + format(voltage, ".1f") + "V " + self._title_case(stype) + " Sensor $" + format(price, ".2f") + " X " + str(qty))
 
     def create_buzzer(self) -> None:
@@ -209,27 +219,24 @@ class UI:
         print("Voltage is usually between 1 and 12")
         voltage = self._input_float("Please enter voltage (V): ", min_val=0.0001)
         print("Current is usually between 100 and 1000 milliAmps")
-        current_ma = self._input_float("Please enter current (mA): ", min_val=0.0001)
+        current_mA = self._input_float("Please enter current (mA): ", min_val=0.0001)
         price = self._input_float("Please enter price: ", min_val=0.0)
         qty = self._input_int("Please enter number of Buzzers: ", min_val=1)
-        self.app.add_circuitkit_row([
-            str(qty), "Buzzer",
-            format(freq, ".0f"), format(spl, ".0f"),
-            format(voltage, ".1f"), format(current_ma, ".0f"),
-            format(price, ".2f")
-        ])
-        print("Added " + format(voltage, ".1f") + "V " + format(current_ma, ".1f") + "mA " +
+        comp = Buzzer("Buzzer", price, voltage, current_mA / 1000.0, freq, spl)
+        self.app.add_circuitkit_object(qty, comp)
+        print("Added " + format(voltage, ".1f") + "V " + format(current_mA, ".1f") + "mA " +
               format(freq, ".1f") + "Hz " + str(int(spl)) + "dB Buzzer $" + format(price, ".2f") + " X " + str(qty))
 
-
+    #       VIEW/BUY/SELL
     def _format_component_row_for_list(self, row: List[str]) -> str:
+        """
+        Per-kind formatting for ALL COMPONENTS list (all-caps style).
+        """
         if not row or len(row) < 2:
             return "INVALID ROW"
 
         qty = row[0]
-        kind = row[1].strip()
-        k = kind.lower()
-
+        kind = row[1].strip().lower()
 
         def _fmt(val: str, digits: int) -> str:
             try:
@@ -237,18 +244,18 @@ class UI:
             except Exception:
                 return val
 
-        if k == "wire":
+        if kind == "wire":
             length_mm = _fmt(row[2], 0)
             price = _fmt(row[3], 2)
             return length_mm + "MM WIRE $" + price + " X " + qty
 
-        elif k == "battery":
+        if kind == "battery":
             size = row[2].upper()
             voltage = _fmt(row[3], 1)
             price = _fmt(row[4], 2)
             return voltage + "V " + size + " BATTERY $" + price + " X " + qty
 
-        elif k == "solar panel":
+        if kind == "solar panel":
             voltage = _fmt(row[2], 1)
             try:
                 current_mA = float(row[3]) * 1000.0
@@ -258,33 +265,33 @@ class UI:
             price = _fmt(row[4], 2)
             return voltage + "V " + current_str + "MA SOLAR PANEL $" + price + " X " + qty
 
-        elif k == "light globe":
+        if kind == "light globe":
             colour = row[2].upper()
             voltage = _fmt(row[3], 1)
             current_mA = _fmt(row[4], 1)
             price = _fmt(row[5], 2)
             return voltage + "V " + current_mA + "MA " + colour + " LIGHT GLOBE $" + price + " X " + qty
 
-        elif k == "led light":
+        if kind == "led light":
             colour = row[2].upper()
             voltage = _fmt(row[3], 1)
             current_mA = _fmt(row[4], 1)
             price = _fmt(row[5], 2)
             return voltage + "V " + current_mA + "MA " + colour + " LED LIGHT $" + price + " X " + qty
 
-        elif k == "switch":
+        if kind == "switch":
             swtype = row[2].upper()
             voltage = _fmt(row[3], 1)
             price = _fmt(row[4], 2)
             return voltage + "V " + swtype + " SWITCH $" + price + " X " + qty
 
-        elif k == "sensor":
+        if kind == "sensor":
             stype = row[2].upper()
             voltage = _fmt(row[3], 1)
             price = _fmt(row[4], 2)
             return voltage + "V " + stype + " SENSOR $" + price + " X " + qty
 
-        elif k == "buzzer":
+        if kind == "buzzer":
             freq = _fmt(row[2], 1)
             try:
                 spl_int = str(int(float(row[3])))
@@ -298,6 +305,90 @@ class UI:
         name = " ".join(row[1:]).upper()
         return name + " X " + qty
 
+    def _format_component_heading_caps(self, row: List[str]) -> str:
+        # e.g. 1.4V 0.4MA SOLAR PANEL $14.00
+        kind = row[1].strip().lower()
+
+        def _f(v, n):
+            try:
+                return format(float(v), "." + str(n) + "f")
+            except:
+                return v
+
+        if kind == "wire":
+            return _f(row[2], 0) + "MM WIRE $" + _f(row[3], 2)
+
+        if kind == "battery":
+            return _f(row[3], 1) + "V " + row[2].upper() + " BATTERY $" + _f(row[4], 2)
+
+        if kind == "solar panel":
+            v = _f(row[2], 1)
+            try:
+                ma = format(float(row[3]) * 1000.0, ".1f")
+            except:
+                ma = row[3]
+            return v + "V " + ma + "MA SOLAR PANEL $" + _f(row[4], 2)
+
+        if kind == "light globe":
+            return _f(row[3], 1) + "V " + _f(row[4], 1) + "MA " + row[2].upper() + " LIGHT GLOBE $" + _f(row[5], 2)
+
+        if kind == "led light":
+            return _f(row[3], 1) + "V " + _f(row[4], 1) + "MA " + row[2].upper() + " LED LIGHT $" + _f(row[5], 2)
+
+        if kind == "switch":
+            return _f(row[3], 1) + "V " + row[2].upper() + " SWITCH $" + _f(row[4], 2)
+
+        if kind == "sensor":
+            return _f(row[3], 1) + "V " + row[2].upper() + " SENSOR $" + _f(row[4], 2)
+
+        if kind == "buzzer":
+            return _f(row[4], 1) + "V " + _f(row[5], 1) + "MA " + _f(row[2], 1) + "HZ " + str(int(float(row[3]))) + "DB BUZZER $" + _f(row[6], 2)
+
+        return " ".join(row[1:]).upper()
+
+    def _format_component_heading_pretty(self, row: List[str]) -> str:
+        # e.g. 1.4V 0.4mA Solar Panel $14.00
+        kind = row[1].strip().lower()
+
+        def _f(v, n):
+            try:
+                return format(float(v), "." + str(n) + "f")
+            except:
+                return v
+
+        def _tc(s):
+            return s[:1].upper() + s[1:].lower()
+
+        if kind == "wire":
+            return _f(row[2], 0) + "mm Wire $" + _f(row[3], 2)
+
+        if kind == "battery":
+            return _f(row[3], 1) + "V " + row[2].upper() + " Battery $" + _f(row[4], 2)
+
+        if kind == "solar panel":
+            v = _f(row[2], 1)
+            try:
+                ma = format(float(row[3]) * 1000.0, ".1f")
+            except:
+                ma = row[3]
+            return v + "V " + ma + "mA Solar Panel $" + _f(row[4], 2)
+
+        if kind == "light globe":
+            return _f(row[3], 1) + "V " + _f(row[4], 1) + "mA " + _tc(row[2]) + " Light Globe $" + _f(row[5], 2)
+
+        if kind == "led light":
+            return _f(row[3], 1) + "V " + _f(row[4], 1) + "mA " + _tc(row[2]) + " LED Light $" + _f(row[5], 2)
+
+        if kind == "switch":
+            return _f(row[3], 1) + "V " + _tc(row[2]) + " Switch $" + _f(row[4], 2)
+
+        if kind == "sensor":
+            return _f(row[3], 1) + "V " + _tc(row[2]) + " Sensor $" + _f(row[4], 2)
+
+        if kind == "buzzer":
+            return _f(row[4], 1) + "V " + _f(row[5], 1) + "mA " + _f(row[2], 1) + "Hz " + str(int(float(row[3]))) + "dB Buzzer $" + _f(row[6], 2)
+
+        return " ".join(row[1:])
 
     def view_components(self) -> None:
         rows = self.app.list_circuitKit()
@@ -309,17 +400,44 @@ class UI:
         options = []
         for idx, row in enumerate(rows):
             label = self._format_component_row_for_list(row)
-            options.append((label, (lambda r=row: self._open_component(r))))
-
+            options.append((label, (lambda i=idx: self._component_actions(i))))
         options.append(("BACK", None))
 
         Menu("ALL COMPONENTS", options).run()
 
-    def _open_component(self, row: List[str]) -> None:
-        print(self._format_component_row_for_list(row))
-        print("DETAILS: " + ", ".join(row))
+    def _component_actions(self, row_index: int) -> None:
+        row = self.app.get_circuitkit_row(row_index)
+        title = self._format_component_heading_caps(row)
+        print(title)
+        Menu(title, [
+            ("BUY",  (lambda: self._buy_component(row_index))),
+            ("SELL", (lambda: self._sell_component(row_index))),
+            ("BACK", None),
+        ]).run()
         self.view_components()
 
+    def _buy_component(self, row_index: int) -> None:
+        row = self.app.get_circuitkit_row(row_index)
+        pretty = self._format_component_heading_pretty(row)
+        print("Buying " + pretty)
+        qty = self._input_int("Please enter number of " + pretty + ": ", min_val=1)
+        self.app.change_circuitkit_qty(row_index, qty)
+        ts = __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.app.add_component_transaction("Purchase Order", row, qty, ts)
+        caps = self._format_component_heading_caps(row)
+        print("Bought " + caps + " X " + str(qty))
+        print("Completing Purchase Order " + ts)
+
+    def _sell_component(self, row_index: int) -> None:
+        row = self.app.get_circuitkit_row(row_index)
+        pretty = self._format_component_heading_pretty(row)
+        print("Selling " + pretty)
+        qty = self._input_int("Please enter number of " + pretty + ": ", min_val=1)
+        self.app.change_circuitkit_qty(row_index, -qty)
+        ts = __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.app.add_component_transaction("Customer Sale", row, qty, ts)
+        print("Sold " + pretty + " X " + str(qty))
+        print("Completing Customer Sale " + ts)
 
     #       CIRCUIT KITS
     def circuits_menu(self) -> None:
@@ -351,7 +469,7 @@ class UI:
         for i, row in enumerate(rows, 1):
             print(str(i) + " " + ", ".join(row))
 
-    #       PURCHASE ORDERS, CUSTOMER SALES, TRANSACTIONS
+    #       PURCHASE/SALES
     def purchase_orders_menu(self) -> None:
         Menu("PURCHASE ORDERS MENU", [
             ("NEW PURCHASE ORDER", lambda: print("[TODO] Create Purchase Order")),
@@ -393,7 +511,7 @@ class UI:
             ("BACK", None),
         ]).run()
 
-    #       CLOSE APP
+    #       CLOSE
     def close_app(self) -> None:
         print("Saving and Closing")
         self.app.save()
