@@ -11,7 +11,7 @@ class App:
         self.__base_dir = os.path.dirname(os.path.abspath(__file__))
         self.__data_dir = os.path.join(self.__base_dir, "data")
         self.__components_path = os.path.join(self.__data_dir, "circuitKit.csv")
-        self.__circuits_path = os.path.join(self.__data_dir, "circuits.csv")
+        self.__circuits_path = os.path.join(self.__data_dir, "component.csv")
         self.__transactions_path = os.path.join(self.__data_dir, "transactions.csv")
         self.__components: Dict[str, int] = {}
         self.__circuits: Dict[str, Dict[str, Any]] = {}
