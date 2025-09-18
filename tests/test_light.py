@@ -1,3 +1,13 @@
+# Academic Integrity Statment
+# Filename: test_light.py
+# Author: Botao Huang
+# Student ID: 521560
+# Email: 521560@learning.eynesbury.edu.au
+# Date: 17 SEP 2025
+# Description: Test code for Light class
+# This is my own work as defined by the Academic Integrity Policy
+
+
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 

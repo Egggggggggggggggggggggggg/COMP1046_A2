@@ -1,3 +1,12 @@
+# Academic Integrity Statment
+# Filename: Light.py
+# Author: Botao Huang
+# Student ID: 521560
+# Email: 521560@learning.eynesbury.edu.au
+# Date: 17 SEP 2025
+# Description: Light class
+# This is my own work as defined by the Academic Integrity Policy
+
 from component.Component import Component
 
 class Light(Component):
