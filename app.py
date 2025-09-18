@@ -10,8 +10,8 @@ class App:
     def __init__(self) -> None:
         self.__base_dir = os.path.dirname(os.path.abspath(__file__))
         self.__data_dir = os.path.join(self.__base_dir, "data")
-        self.__components_path = os.path.join(self.__data_dir, "circuitKit.csv")
-        self.__circuits_path = os.path.join(self.__data_dir, "component.csv")
+        self.__components_path = os.path.join(self.__data_dir, "circuits.csv ")
+        self.__circuits_path = os.path.join(self.__data_dir, "components.csv")
         self.__transactions_path = os.path.join(self.__data_dir, "transactions.csv")
         self.__components: Dict[str, int] = {}
         self.__circuits: Dict[str, Dict[str, Any]] = {}
@@ -35,27 +35,33 @@ class App:
 
     def __load_components(self) -> None:
         self.__components.clear()
-        with open(self.__components_path, "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if line == "":
+        with open(self.__components_path, "r", encoding="utf-8", newline="") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if not row or len(row) < 2:
                     continue
-                first_comma = line.find(",")
-                if first_comma == -1:
-                    continue
-                qty_s = line[:first_comma].strip()
-                frag = line[first_comma + 1:].strip()
+                qty_s = row[0].strip()
                 try:
                     qty = int(qty_s)
                 except Exception:
                     qty = 0
+
+                parts = [c.strip() for c in row[1:]]
+                if len(parts) == 1:
+                    frag = parts[0]
+                    if len(frag) >= 2 and frag[0] == '"' and frag[-1] == '"':
+                        frag = frag[1:-1].replace('""', '"')
+                else:
+                    frag = ",".join(parts)
+
                 self.__components[frag] = self.__components.get(frag, 0) + qty
 
     def save_components(self) -> None:
         with open(self.__components_path, "w", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f)
+            writer = csv.writer(f, quoting=csv.QUOTE_MINIMAL)
             for frag, qty in self.__components.items():
-                writer.writerow([qty, frag])
+                parts = [c.strip() for c in frag.split(",")]
+                writer.writerow([qty] + parts)
 
     def list_component_rows(self) -> List[Tuple[int, str]]:
         items = []
@@ -165,18 +171,20 @@ class App:
         self.add_circuit_transaction("Unpack", kit, count)
 
     def add_component_transaction(self, op_type: str, frag: str, qty: int) -> None:
-        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        ts = __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        frag = self._normalize_frag(frag) if hasattr(self, "_normalize_frag") else str(frag).strip()
         with open(self.__transactions_path, "a", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f)
+            writer = __import__("csv").writer(f)
             row = [op_type, " " + ts, qty]
             row.extend([c.strip() for c in frag.split(",")])
             writer.writerow(row)
 
-    def add_circuit_transaction(self, op_type: str, kit: CircuitKit, qty: int) -> None:
-        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    def add_circuit_transaction(self, op_type: str, kit, qty: int) -> None:
+        ts = __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open(self.__transactions_path, "a", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f)
-            row = [op_type, " " + ts, qty, "KIT", kit.name, kit.items_to_json()]
+            writer = __import__("csv").writer(f)
+            row = [op_type, " " + ts, qty]
+            row.extend(self.__flatten_kit_tail_tokens(kit))
             writer.writerow(row)
 
     def buy_component(self, frag: str, qty: int) -> None:
@@ -216,6 +224,14 @@ class App:
         self.add_circuit_transaction("Customer Sale", kit, qty)
         return True
 
+    def __flatten_kit_tail_tokens(self, kit) -> list:
+        tail = [kit.name]
+        for (iqty, frag) in kit.items:
+            frag = self._normalize_frag(frag) if hasattr(self, "_normalize_frag") else str(frag).strip()
+            cols = [c.strip() for c in frag.split(",")]
+            tail.append(str(int(iqty)))
+            tail.extend(cols)
+        return tail
 
 if __name__ == "__main__":
     App()

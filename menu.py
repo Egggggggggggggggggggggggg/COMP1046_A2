@@ -135,18 +135,38 @@ class UI:
         except Exception:
             return 0.0
 
-    def _summarize_transactions(self) -> List[Tuple[str, str, float]]:
+    def _summarize_transactions(self) -> list:
+        import os, csv
         base_dir = os.path.dirname(os.path.abspath(__file__))
         path = os.path.join(base_dir, "data", "transactions.csv")
-        summaries: List[Tuple[str, str, float]] = []
+
+        # item 类型 -> 列数（不含 item_qty 本身）
+        arity = {
+            "Wire": 3,             # Wire,length_mm,price
+            "Battery": 4,          # Battery,size,volt,price
+            "Solar Panel": 4,      # Solar Panel,volt,current(mA),price
+            "Light Globe": 5,      # Light Globe,colour,volt,current(mA),price
+            "LED Light": 5,        # LED Light,colour,volt,current(mA),price
+            "Switch": 4,           # Switch,type,volt,price
+            "Sensor": 4,           # Sensor,type,volt,price
+            "Buzzer": 6,           # Buzzer,freq,spl,volt,current(mA),price
+        }
+
+        def price_of_component_fields(fields: list) -> float:
+            try:
+                return float(fields[-1])
+            except Exception:
+                return 0.0
+
+        summaries = []
         totals_map = {}
-        order_keys: List[Tuple[str, str]] = []
+        order_keys = []
 
         try:
             with open(path, "r", encoding="utf-8", newline="") as f:
-                reader = csv.reader(f)
-                for row in reader:
-                    if row is None or len(row) == 0:
+                rdr = csv.reader(f)
+                for row in rdr:
+                    if not row:
                         continue
                     try:
                         op_type = row[0].strip()
@@ -156,23 +176,33 @@ class UI:
                         continue
 
                     amount = 0.0
-                    if len(row) >= 4 and row[3].strip() == "KIT":
-                        try:
-                            items_json = row[5]
-                            items = json.loads(items_json)
-                            unit_sum = 0.0
-                            for it in items:
-                                iq = int(it.get("qty", 0))
-                                frag = str(it.get("row", ""))
-                                unit_sum = unit_sum + (iq * self._price_from_frag(frag))
-                            amount = unit_sum * qty
-                        except Exception:
-                            amount = 0.0
+
+                    if len(row) >= 4 and row[3].strip() in arity:
+                        amount = qty * price_of_component_fields(row[3:])
                     else:
-                        try:
-                            unit_price = float(row[-1])
-                            amount = qty * unit_price
-                        except Exception:
+                        if len(row) >= 5:
+                            kits_qty = qty
+                            i = 4
+                            unit_sum = 0.0
+                            while i < len(row):
+                                # item_qty
+                                try:
+                                    item_qty = int(str(row[i]).strip())
+                                except Exception:
+                                    break
+                                i = i + 1
+                                if i >= len(row):
+                                    break
+                                item_type = row[i].strip()
+                                i = i + 1
+                                ncols = arity.get(item_type, 0)
+                                if ncols <= 0 or i + ncols - 1 >= len(row):
+                                    break
+                                item_fields = [item_type] + row[i:i + ncols]
+                                i = i + ncols
+                                unit_sum = unit_sum + (item_qty * price_of_component_fields(item_fields))
+                            amount = unit_sum * kits_qty
+                        else:
                             amount = 0.0
 
                     key = (op_type, ts)
@@ -188,7 +218,6 @@ class UI:
             total = totals_map.get(key, 0.0)
             summaries.append((op_type, ts, total))
         return summaries
-
 
     def _component_row_to_caps_title(self, frag: str) -> str:
         return self._component_row_to_pretty_title(frag).upper()
