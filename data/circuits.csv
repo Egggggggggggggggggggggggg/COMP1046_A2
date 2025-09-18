@@ -5,7 +5,7 @@
 14,Wire,30,1.9
 22,Wire,100,3.6
 30,Wire,120,4.0
-14,Wire,150,5.2
+10,Wire,150,5.2
 11,Wire,200,6.5
 4,Solar Panel,1.4,0.4,14.00
 3,Solar Panel,1.8,0.6,16.00
@@ -36,7 +36,7 @@
 5,Sensor,touch,3.3,3.2
 5,Sensor,dust,5,5.4
 5,Sensor,temperature,3.3,3.6
-5,Sensor,humidity,5,3.8
+4,Sensor,humidity,5,3.8
 4,Sensor,light,5,3.4
 4,Sensor,motion,12,4.1
 20,LED Light,red,3,150,2.2
@@ -54,7 +54,7 @@
 6,Light Globe,warm,5.5,220,3.3
 6,Light Globe,neutral,9.0,260,3.9
 6,Light Globe,cool,12.0,300,4.2
-5,Buzzer,240,90,4,120,5.6
+3,Buzzer,240,90,4,120,5.6
 6,Buzzer,140,80,3.2,140,4.4
 6,Buzzer,230,85,3.3,110,4.1
 4,Buzzer,400,90,5.0,150,6.2

@@ -1,45 +1,47 @@
-import os
-import csv
-import json
-import sys
-from typing import Callable, Optional, List, Tuple
+from typing import Callable, Optional, List, Tuple, Any
 from circuitkit.CircuitKit import CircuitKit
 
 
-class SelectorMenu:
-    def __init__(self, title: str, options: List[Tuple[str, Optional[Callable[[], None]]]], prompt: str = "Please enter a number: ") -> None:
+class Menu:
+    '''
+    Simple single-shot menu helper: prints a title and numbered options; runs selection.
+    '''
+    def __init__(self, title: str, options: List[tuple[str, Optional[Callable[[], None]]]], prompt: str = "Please enter a number: ") -> None:
         self._title = title
         self._options = options
         self._prompt = prompt
 
     def _input_select(self) -> Optional[Callable[[], None]]:
-        sel = input(self._prompt).strip()
-        idx = int(sel) - 1
-        if idx < 0 or idx >= len(self._options):
-            raise ValueError("Wrong input, must be a number between 1 and " + str(len(self._options)))
-        _, fn = self._options[idx]
-        return fn
-
-    def run(self) -> bool:
         print(self._title)
         for i, (name, _) in enumerate(self._options, 1):
             print(str(i) + ". " + name)
+        sel = input(self._prompt).strip()
         try:
-            fn = self._input_select()
-            if fn is None:
-                return False
+            idx = int(sel) - 1
+        except Exception:
+            print("Wrong input, must be a number.")
+            return self._input_select()
+        if idx < 0 or idx >= len(self._options):
+            print("Wrong input, must be a number between 1 and " + str(len(self._options)))
+            return self._input_select()
+        name, fn = self._options[idx]
+        print(name)
+        return fn
+
+    def run(self) -> None:
+        fn = self._input_select()
+        if fn is None:
+            return
+        try:
             fn()
-            return True
-        except ValueError as e:
-            print(str(e))
-            return True
+        except SystemExit:
+            raise
         except Exception as e:
             print("Error: " + str(e))
-            return True
 
 
 class UI:
-    def __init__(self, app) -> None:
+    def __init__(self, app: Any) -> None:
         self.app = app
 
     def _input_int(self, prompt: str, min_val: Optional[int] = None, max_val: Optional[int] = None) -> int:
@@ -51,201 +53,93 @@ class UI:
             raise ValueError("Value must be at most " + str(max_val))
         return v
 
-    def _input_float(self, prompt: str, min_val: Optional[float] = None, max_val: Optional[float] = None) -> float:
-        s = input(prompt).strip()
-        v = float(s)
-        if min_val is not None and v < min_val:
-            raise ValueError("Value must be at least " + str(min_val))
-        if max_val is not None and v > max_val:
-            raise ValueError("Value must be at most " + str(max_val))
-        return v
-
-    def _to_float(self, s: str) -> float:
-        try:
-            return float(s)
-        except Exception:
-            return 0.0
-
-    def _now_string(self) -> str:
-        import datetime
-        return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    def _extract_price_string(self, frag: str) -> str:
-        parts = [c.strip() for c in frag.split(",")]
-        if len(parts) == 0:
-            return "0.00"
-        return parts[-1]
-
-    def _fmt(self, s: str) -> str:
-        try:
-            v = float(s)
-            return str(round(v, 1))
-        except Exception:
-            return s
-
-    def _to_title(self, s: str) -> str:
+    def _tc(self, s: str) -> str:
         if s is None or s == "":
             return ""
-        lowers = set(["with", "and", "or", "of", "the", "a", "an", "x"])
-        t = s.strip()
-        if t.lower() in lowers:
-            return t.lower()
-        return t[0:1].upper() + t[1:].lower()
+        return s[0:1].upper() + s[1:].lower()
 
-    def _component_row_to_pretty_title(self, frag: str) -> str:
-        try:
-            cols = [c.strip() for c in frag.split(",")]
-            ctype = cols[0]
-            if ctype == "Wire" and len(cols) >= 3:
-                return cols[1] + "mm Wire"
-            if ctype == "Battery" and len(cols) >= 4:
-                return cols[2] + "V " + cols[1] + " Battery"
-            if ctype == "Solar Panel" and len(cols) >= 4:
-                return cols[1] + "V " + cols[2] + "mA Solar Panel"
-            if ctype == "Light Globe" and len(cols) >= 5:
-                colour = cols[1]
-                volt = cols[2]
-                curr = cols[3]
-                return volt + "V " + self._fmt(curr) + "mA " + self._to_title(colour) + " Light Globe"
-            if ctype == "LED Light" and len(cols) >= 5:
-                colour = cols[1]
-                volt = cols[2]
-                curr = cols[3]
-                return volt + "V " + self._fmt(curr) + "mA " + self._to_title(colour) + " LED Light"
-            if ctype == "Switch" and len(cols) >= 3:
-                return cols[2] + "V " + self._to_title(cols[1]) + " Switch"
-            if ctype == "Sensor" and len(cols) >= 3:
-                return cols[2] + "V " + self._to_title(cols[1]) + " Sensor"
-            if ctype == "Buzzer" and len(cols) >= 6:
-                freq = cols[1]
-                spl = cols[2]
-                volt = cols[3]
-                curr = cols[4]
-                return volt + "V " + self._fmt(curr) + "mA " + self._fmt(freq) + "Hz " + spl + "dB Buzzer"
-            return ctype
-        except Exception:
-            return frag
-
-    def _price_from_frag(self, frag: str) -> float:
+    def _component_caps(self, frag: str) -> str:
         parts = [c.strip() for c in frag.split(",")]
-        if len(parts) == 0:
-            return 0.0
-        try:
-            return float(parts[-1])
-        except Exception:
-            return 0.0
-
-    def _summarize_transactions(self) -> list:
-        import os, csv
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        path = os.path.join(base_dir, "data", "transactions.csv")
-
-        # item 类型 -> 列数（不含 item_qty 本身）
-        arity = {
-            "Wire": 3,             # Wire,length_mm,price
-            "Battery": 4,          # Battery,size,volt,price
-            "Solar Panel": 4,      # Solar Panel,volt,current(mA),price
-            "Light Globe": 5,      # Light Globe,colour,volt,current(mA),price
-            "LED Light": 5,        # LED Light,colour,volt,current(mA),price
-            "Switch": 4,           # Switch,type,volt,price
-            "Sensor": 4,           # Sensor,type,volt,price
-            "Buzzer": 6,           # Buzzer,freq,spl,volt,current(mA),price
-        }
-
-        def price_of_component_fields(fields: list) -> float:
+        kind = parts[0] if len(parts) > 0 else ""
+        def _f(x, n):
             try:
-                return float(fields[-1])
+                return format(float(x), "." + str(n) + "f")
             except Exception:
-                return 0.0
+                return x
+        if kind == "Wire" and len(parts) >= 3:
+            return _f(parts[1], 0) + "MM WIRE $" + _f(parts[2], 2)
+        if kind == "Battery" and len(parts) >= 4:
+            return _f(parts[2], 1) + "V " + parts[1].upper() + " BATTERY $" + _f(parts[3], 2)
+        if kind == "Solar Panel" and len(parts) >= 4:
+            try:
+                ma = format(float(parts[2]) * 1000.0, ".1f")
+            except Exception:
+                ma = parts[2]
+            return _f(parts[1], 1) + "V " + ma + "MA SOLAR PANEL $" + _f(parts[3], 2)
+        if kind == "Light Globe" and len(parts) >= 5:
+            return _f(parts[2], 1) + "V " + _f(parts[3], 1) + "MA " + parts[1].upper() + " LIGHT GLOBE $" + _f(parts[4], 2)
+        if kind == "LED Light" and len(parts) >= 5:
+            return _f(parts[2], 1) + "V " + _f(parts[3], 1) + "MA " + parts[1].upper() + " LED LIGHT $" + _f(parts[4], 2)
+        if kind == "Switch" and len(parts) >= 4:
+            return _f(parts[2], 1) + "V " + parts[1].upper() + " SWITCH $" + _f(parts[3], 2)
+        if kind == "Sensor" and len(parts) >= 4:
+            return _f(parts[2], 1) + "V " + parts[1].upper() + " SENSOR $" + _f(parts[3], 2)
+        if kind == "Buzzer" and len(parts) >= 6:
+            return _f(parts[3], 1) + "V " + _f(parts[4], 1) + "MA " + _f(parts[1], 1) + "HZ " + str(int(float(parts[2]))) + "DB BUZZER $" + _f(parts[5], 2)
+        return frag.upper()
 
-        summaries = []
-        totals_map = {}
-        order_keys = []
+    def _component_pretty(self, frag: str) -> str:
+        parts = [c.strip() for c in frag.split(",")]
+        kind = parts[0] if len(parts) > 0 else ""
+        def _f(x, n):
+            try:
+                return format(float(x), "." + str(n) + "f")
+            except Exception:
+                return x
+        def _t(s):
+            return self._tc(s)
+        if kind == "Wire" and len(parts) >= 3:
+            return _f(parts[1], 0) + "mm Wire $" + _f(parts[2], 2)
+        if kind == "Battery" and len(parts) >= 4:
+            return _f(parts[2], 1) + "V " + parts[1].upper() + " Battery $" + _f(parts[3], 2)
+        if kind == "Solar Panel" and len(parts) >= 4:
+            try:
+                ma = format(float(parts[2]) * 1000.0, ".1f")
+            except Exception:
+                ma = parts[2]
+            return _f(parts[1], 1) + "V " + ma + "mA Solar Panel $" + _f(parts[3], 2)
+        if kind == "Light Globe" and len(parts) >= 5:
+            return _f(parts[2], 1) + "V " + _f(parts[3], 1) + "mA " + _t(parts[1]) + " Light Globe $" + _f(parts[4], 2)
+        if kind == "LED Light" and len(parts) >= 5:
+            return _f(parts[2], 1) + "V " + _f(parts[3], 1) + "mA " + _t(parts[1]) + " LED Light $" + _f(parts[4], 2)
+        if kind == "Switch" and len(parts) >= 4:
+            return _f(parts[2], 1) + "V " + _t(parts[1]) + " Switch $" + _f(parts[3], 2)
+        if kind == "Sensor" and len(parts) >= 4:
+            return _f(parts[2], 1) + "V " + _t(parts[1]) + " Sensor $" + _f(parts[3], 2)
+        if kind == "Buzzer" and len(parts) >= 6:
+            return _f(parts[3], 1) + "V " + _f(parts[4], 1) + "mA " + _f(parts[1], 1) + "Hz " + str(int(float(parts[2]))) + "dB Buzzer $" + _f(parts[5], 2)
+        return frag
 
-        try:
-            with open(path, "r", encoding="utf-8", newline="") as f:
-                rdr = csv.reader(f)
-                for row in rdr:
-                    if not row:
-                        continue
-                    try:
-                        op_type = row[0].strip()
-                        ts = row[1].strip()
-                        qty = int(str(row[2]).strip())
-                    except Exception:
-                        continue
-
-                    amount = 0.0
-
-                    if len(row) >= 4 and row[3].strip() in arity:
-                        amount = qty * price_of_component_fields(row[3:])
-                    else:
-                        if len(row) >= 5:
-                            kits_qty = qty
-                            i = 4
-                            unit_sum = 0.0
-                            while i < len(row):
-                                # item_qty
-                                try:
-                                    item_qty = int(str(row[i]).strip())
-                                except Exception:
-                                    break
-                                i = i + 1
-                                if i >= len(row):
-                                    break
-                                item_type = row[i].strip()
-                                i = i + 1
-                                ncols = arity.get(item_type, 0)
-                                if ncols <= 0 or i + ncols - 1 >= len(row):
-                                    break
-                                item_fields = [item_type] + row[i:i + ncols]
-                                i = i + ncols
-                                unit_sum = unit_sum + (item_qty * price_of_component_fields(item_fields))
-                            amount = unit_sum * kits_qty
-                        else:
-                            amount = 0.0
-
-                    key = (op_type, ts)
-                    if key not in totals_map:
-                        totals_map[key] = 0.0
-                        order_keys.append(key)
-                    totals_map[key] = totals_map[key] + amount
-        except FileNotFoundError:
-            return []
-
-        for key in order_keys:
-            op_type, ts = key
-            total = totals_map.get(key, 0.0)
-            summaries.append((op_type, ts, total))
-        return summaries
-
-    def _component_row_to_caps_title(self, frag: str) -> str:
-        return self._component_row_to_pretty_title(frag).upper()
-
-    def _infer_circuit_base_name(self, items: List[Tuple[int, str]]) -> str:
-        has_light_globe = False
-        has_led_light = False
+    def _infer_kit_name(self, items: List[Tuple[int, str]]) -> str:
+        has_globe = False
+        has_led = False
         has_sensor = False
         for q, frag in items:
-            head = frag.split(",")[0].strip()
-            if head == "Light Globe":
-                has_light_globe = True
-            elif head == "LED Light":
-                has_led_light = True
-            elif head == "Sensor":
+            t = frag.split(",")[0].strip()
+            if t == "Light Globe":
+                has_globe = True
+            elif t == "LED Light":
+                has_led = True
+            elif t == "Sensor":
                 has_sensor = True
-        if has_sensor and (has_light_globe or has_led_light):
-            return "Sensor Circuit"
         if has_sensor:
             return "Sensor Circuit"
-        if has_light_globe:
-            return "Light Circuit"
-        if has_led_light:
+        if has_globe or has_led:
             return "Light Circuit"
         return "Circuit"
 
     def home(self) -> None:
-        SelectorMenu("HOME MENU", [
+        Menu("HOME MENU", [
             ("COMPONENTS", self.components_menu),
             ("CIRCUIT KITS", self.circuits_menu),
             ("PURCHASE ORDERS", self.purchase_orders_menu),
@@ -256,454 +150,280 @@ class UI:
         self.home()
 
     def components_menu(self) -> None:
-        again = SelectorMenu("COMPONENT MENU", [
+        Menu("COMPONENT MENU", [
             ("NEW COMPONENT", self.new_component_menu),
             ("VIEW COMPONENTS", self.view_components),
             ("BACK", None),
         ]).run()
-        if again:
-            self.components_menu()
 
     def new_component_menu(self) -> None:
-        again = SelectorMenu("NEW COMPONENT MENU", [
-            ("WIRE", self.create_wire),
-            ("BATTERY", self.create_battery),
-            ("SOLAR PANEL", self.create_solar_panel),
-            ("LIGHT GLOBE", self.create_light_globe),
-            ("LED LIGHT", self.create_led_light),
-            ("SWITCH", self.create_switch),
-            ("SENSOR", self.create_sensor),
-            ("BUZZER", self.create_buzzer),
+        Menu("NEW COMPONENT MENU", [
+            ("WIRE", lambda: print("NEW WIRE")),
+            ("BATTERY", lambda: print("NEW BATTERY")),
+            ("SOLAR PANEL", lambda: print("NEW SOLAR PANEL")),
+            ("LIGHT GLOBE", lambda: print("NEW LIGHT GLOBE")),
+            ("LED LIGHT", lambda: print("NEW LED LIGHT")),
+            ("SWITCH", lambda: print("NEW SWITCH")),
+            ("SENSOR", lambda: print("NEW SENSOR")),
+            ("BUZZER", lambda: print("NEW BUZZER")),
             ("BACK", None),
         ]).run()
-        if again:
-            self.new_component_menu()
 
     def view_components(self) -> None:
-        comp_list = self.app.list_component_rows()
+        rows = self.app.list_component_rows()
+        if not rows:
+            print("ALL COMPONENTS")
+            print("No components yet.")
+            return
         options: List[Tuple[str, Optional[Callable[[], None]]]] = []
-        for qty, frag in comp_list:
-            title = self._component_row_to_caps_title(frag)
-            price = self._extract_price_string(frag)
-            label = title + " $" + price + " X " + str(qty)
+        for qty, frag in rows:
+            label = self._component_caps(frag) + " X " + str(qty)
             options.append((label, (lambda f=frag: self._component_actions(f))))
         options.append(("BACK", None))
-        again = SelectorMenu("ALL COMPONENTS", options).run()
-        if again:
-            self.view_components()
+        Menu("ALL COMPONENTS", options).run()
 
     def _component_actions(self, frag: str) -> None:
-        title = self._component_row_to_pretty_title(frag)
-        price = self._extract_price_string(frag)
-        def buy() -> None:
-            print("Buying " + title + " $" + price)
-            n = self._input_int("Please enter number of " + title + " $" + price + ": ", 1, None)
-            self.app.buy_component(frag, n)
-            print("Bought " + self._component_row_to_caps_title(frag) + " $" + price + " X " + str(n))
-            print("Completing Purchase Order " + self._now_string())
-        def sell() -> None:
-            print("Selling " + title + " $" + price)
-            n = self._input_int("Please enter number of " + title + " $" + price + ": ", 1, None)
-            ok = self.app.sell_component(frag, n)
-            if ok:
-                print("Sold " + title + " $" + price + " X " + str(n))
-                print("Completing Customer Sale " + self._now_string())
-            else:
-                print("Not enough stock to sell.")
-        SelectorMenu(title + " $" + price, [
-            ("BUY", buy),
-            ("SELL", sell),
+        title = self._component_caps(frag)
+        Menu(title, [
+            ("BUY",  (lambda: self._buy_component(frag))),
+            ("SELL", (lambda: self._sell_component(frag))),
             ("BACK", None),
         ]).run()
+        self.view_components()
+
+    def _buy_component(self, frag: str) -> None:
+        pretty = self._component_pretty(frag)
+        print("Buying " + pretty)
+        qty = self._input_int("Please enter number of " + pretty + ": ", 1)
+        self.app.buy_component(frag, qty)
+        print("Bought " + self._component_caps(frag) + " X " + str(qty))
+        print("Completing Purchase Order " + datetime_now())
+
+    def _sell_component(self, frag: str) -> None:
+        pretty = self._component_pretty(frag)
+        print("Selling " + pretty)
+        qty = self._input_int("Please enter number of " + pretty + ": ", 1)
+        ok = self.app.sell_component(frag, qty)
+        if ok:
+            print("Sold " + pretty + " X " + str(qty))
+            print("Completing Customer Sale " + datetime_now())
+        else:
+            print("Not enough stock.")
 
     def circuits_menu(self) -> None:
-        again = SelectorMenu("CIRCUIT KIT MENU", [
+        Menu("CIRCUIT KIT MENU", [
             ("NEW CIRCUIT KIT", self.new_circuit_menu),
-            ("VIEW CIRCUIT KITS", self.view_circuit_kits),
+            ("VIEW CIRCUIT KITS", self.view_circuitkits),
             ("BACK", None),
         ]).run()
-        if again:
-            self.circuits_menu()
 
     def new_circuit_menu(self) -> None:
-        again = SelectorMenu("NEW CIRCUIT KIT MENU", [
-            ("PACK FROM COMPONENTS", self._pack_from_components),
-            ("BACK", None),
-        ]).run()
-        if again:
-            self.new_circuit_menu()
-
-    def _pack_from_components(self) -> None:
         comp_list = self.app.list_component_rows()
         if len(comp_list) == 0:
+            print("NEW CIRCUIT KIT MENU")
             print("No components available.")
             return
+
+        print("NEW CIRCUIT KIT MENU")
         chosen: List[Tuple[int, str]] = []
-        done = {"v": False}
-        while not done["v"]:
-            options: List[Tuple[str, Optional[Callable[[], None]]]] = []
-            for stock_qty, frag in comp_list:
-                title = self._component_row_to_pretty_title(frag)
-                price = self._extract_price_string(frag)
-                label = title + " $" + price + " x " + str(stock_qty)
-                def make_add(stock_qty_i: int, f: str, t: str, p: str) -> Callable[[], None]:
-                    def _inner() -> None:
-                        already = 0
-                        for qx, fx in chosen:
-                            if fx == f:
-                                already = already + qx
-                        remain = stock_qty_i - already
-                        print("Selecting " + t + " $" + p)
-                        want = self._input_int("Please enter number of " + t + "s: ", 1, None)
-                        if want > remain:
-                            print("Not enough in stock.")
-                            return
-                        chosen.append((want, f))
-                        print("Added " + str(want) + " x " + t)
-                    return _inner
-                options.append((label, make_add(stock_qty, frag, title, price)))
-            def set_done() -> None:
-                done["v"] = True
-            options.append(("DONE", set_done))
-            SelectorMenu("PACK FROM COMPONENTS", options).run()
+        picking = True
+        while picking:
+            index_map = {}
+            for i, (qty, frag) in enumerate(comp_list, 1):
+                print(str(i) + ". " + self._component_pretty(frag) + " X " + str(qty))
+                index_map[i] = (qty, frag)
+            print(str(len(comp_list) + 1) + ". DONE")
+            sel = self._input_int("Please select the component index: ", 1, len(comp_list) + 1)
+            if sel == len(comp_list) + 1:
+                picking = False
+                break
+            have, frag = index_map[sel]
+            want = self._input_int("Please enter number of " + self._component_pretty(frag) + ": ", 1)
+            if want > have:
+                print("Not enough in stock.")
+                continue
+            chosen.append((want, frag))
+            print("Added " + str(want) + " x " + self._component_pretty(frag))
+
         if len(chosen) == 0:
             print("No items selected.")
             return
-        piece_count = 0
-        total_price = 0.0
-        items_for_model: List[Tuple[int, str]] = []
-        for q, frag in chosen:
-            piece_count = piece_count + q
-            unit_price = self._to_float(self._extract_price_string(frag))
-            total_price = total_price + (unit_price * q)
-            items_for_model.append((q, frag))
-        base_name = self._infer_circuit_base_name(items_for_model)
-        display_name = str(piece_count) + " Piece " + base_name
-        kit = CircuitKit(display_name, total_price, items_for_model)
-        if not self.app.can_pack(kit, 1):
-            print("Not enough components to pack.")
-            return
-        print("Adding " + kit.heading_pretty())
-        self.app.perform_pack(kit, 1)
 
-    def view_circuit_kits(self) -> None:
+        base = self._infer_kit_name(chosen)
+        name = input("Please enter kit name (default " + base + "): ").strip()
+        if name == "":
+            name = base
+
+        total_price = 0.0
+        for q, frag in chosen:
+            try:
+                unit = float(frag.split(",")[-1])
+            except Exception:
+                unit = 0.0
+            total_price = total_price + (q * unit)
+
+        kit = CircuitKit(name, total_price, chosen)
+        count = self._input_int("Please enter number of " + kit.heading_pretty() + ": ", 1)
+        if not self.app.can_pack(kit, count):
+            print("Not enough components to pack the requested number.")
+            return
+
+        self.app.perform_pack(kit, count)
+        print("Packed " + kit.heading_pretty() + " X " + str(count))
+
+    def view_circuitkits(self) -> None:
         kits = self.app.list_circuit_objects()
+        if len(kits) == 0:
+            print("ALL CIRCUIT KITS")
+            print("No circuit kits yet.")
+            return
         options: List[Tuple[str, Optional[Callable[[], None]]]] = []
         for qty, kit in kits:
-            label = kit.heading_caps() + " X " + str(qty)
-            options.append((label, (lambda k=kit: self._circuit_actions(k))))
+            options.append((kit.heading_caps() + " X " + str(qty), (lambda k=kit: self._kit_actions(k))))
         options.append(("BACK", None))
-        again = SelectorMenu("ALL CIRCUIT KITS", options).run()
-        if again:
-            self.view_circuit_kits()
+        Menu("ALL CIRCUIT KITS", options).run()
 
-    def _circuit_actions(self, kit: CircuitKit) -> None:
-        title = kit.heading_pretty()
-        def sell() -> None:
-            print("Selling " + title)
-            n = self._input_int("Please enter number of " + title + ": ", 1, None)
-            ok = self.app.sell_circuit(kit.name, n)
-            if ok:
-                print("Sold " + title + " X " + str(n))
-                print("Completing Customer Sale " + self._now_string())
-            else:
-                print("Not enough stock to sell.")
-        def pack_more() -> None:
-            print("Packing " + title)
-            n = self._input_int("Please enter number of " + title + ": ", 1, None)
-            if not self.app.can_pack(kit, n):
-                print("Not enough components to pack the requested number.")
-                return
-            self.app.perform_pack(kit, n)
-            print("Packed " + title + " X " + str(n))
-        def unpack() -> None:
-            print("Unpacking " + title)
-            n = self._input_int("Please enter number of " + title + ": ", 1, None)
-            if not self.app.can_unpack(kit.name, n):
-                print("Not enough kits to unpack.")
-                return
-            self.app.perform_unpack(kit.name, n)
-            print("Unpacked " + title + " X " + str(n))
-        def buy() -> None:
-            print("Buying " + title)
-            n = self._input_int("Please enter number of " + title + ": ", 1, None)
-            ok = self.app.buy_circuit(kit.name, n)
-            if ok:
-                print("Bought " + title + " X " + str(n))
-                print("Completing Purchase Order " + self._now_string())
-            else:
-                print("Kit not found.")
-        SelectorMenu(title, [
-            ("SELL", sell),
-            ("PACK", pack_more),
-            ("UNPACK", unpack),
-            ("BUY", buy),
+    def _kit_actions(self, kit: CircuitKit) -> None:
+        Menu(kit.heading_pretty(), [
+            ("SELL", (lambda: self._sell_kit(kit))),
+            ("PACK", (lambda: self._pack_more(kit))),
+            ("UNPACK", (lambda: self._unpack_kit(kit))),
+            ("BUY", (lambda: self._buy_kit(kit))),
             ("BACK", None),
         ]).run()
+        self.view_circuitkits()
+
+    def _sell_kit(self, kit: CircuitKit) -> None:
+        n = self._input_int("Please enter number of " + kit.heading_pretty() + ": ", 1)
+        ok = self.app.sell_circuit(kit.name, n)
+        if ok:
+            print("Sold " + kit.heading_pretty() + " X " + str(n))
+            print("Completing Customer Sale " + datetime_now())
+        else:
+            print("Not enough stock to sell.")
+
+    def _pack_more(self, kit: CircuitKit) -> None:
+        n = self._input_int("Please enter number of " + kit.heading_pretty() + ": ", 1)
+        if not self.app.can_pack(kit, n):
+            print("Not enough components to pack the requested number.")
+            return
+        self.app.perform_pack(kit, n)
+        print("Packed " + kit.heading_pretty() + " X " + str(n))
+
+    def _unpack_kit(self, kit: CircuitKit) -> None:
+        n = self._input_int("Please enter number of " + kit.heading_pretty() + ": ", 1)
+        if not self.app.can_unpack(kit.name, n):
+            print("Not enough kits to unpack.")
+            return
+        self.app.perform_unpack(kit.name, n)
+        print("Unpacked " + kit.heading_pretty() + " X " + str(n))
+
+    def _buy_kit(self, kit: CircuitKit) -> None:
+        n = self._input_int("Please enter number of " + kit.heading_pretty() + ": ", 1)
+        ok = self.app.buy_circuit(kit.name, n)
+        if ok:
+            print("Bought " + kit.heading_pretty() + " X " + str(n))
+            print("Completing Purchase Order " + datetime_now())
+        else:
+            print("Kit not found.")
 
     def purchase_orders_menu(self) -> None:
-        def add_item() -> None:
-            comp = self.app.list_component_rows()
-            kits = self.app.list_circuit_objects()
-            options: List[Tuple[str, Optional[Callable[[], None]]]] = []
-            for qty, frag in comp:
-                title = self._component_row_to_caps_title(frag)
-                price = self._extract_price_string(frag)
-                label = title + " $" + price
-                def make_buy(f: str, p: str, t: str) -> Callable[[], None]:
-                    def _inner() -> None:
-                        q = self._input_int("Quantity: ", 1, None)
-                        self.app.buy_component(f, q)
-                        print("Adding " + str(q) + " x " + t + " $" + p)
-                    return _inner
-                options.append((label, make_buy(frag, price, title)))
-            for qty, kit in kits:
-                label = kit.heading_caps()
-                def make_buy_kit(k: CircuitKit) -> Callable[[], None]:
-                    def _inner() -> None:
-                        q = self._input_int("Quantity: ", 1, None)
-                        ok = self.app.buy_circuit(k.name, q)
-                        if ok:
-                            print("Adding " + str(q) + " x " + k.heading_caps())
-                        else:
-                            print("Kit not found.")
-                    return _inner
-                options.append((label, make_buy_kit(kit)))
-            options.append(("BACK", None))
-            SelectorMenu("PURCHASE ORDER", options).run()
-        again = SelectorMenu("PURCHASE ORDER", [
-            ("Add Item from Catalogue to Order", add_item),
+        Menu("PURCHASE ORDER", [
+            ("Add Item from Catalogue to Order", self._purchase_add_item),
             ("BACK (CANCEL ORDER)", None),
-        ]).run()
-        if again:
-            self.purchase_orders_menu()
+        ], prompt="Select Option Number: ").run()
+
+    def _purchase_add_item(self) -> None:
+        comp = self.app.list_component_rows()
+        kits = self.app.list_circuit_objects()
+        index_map = {}
+        i = 1
+        print("PURCHASE ORDER")
+        for qty, frag in comp:
+            print(str(i) + ". " + self._component_caps(frag))
+            index_map[i] = ("comp", frag)
+            i = i + 1
+        for qty, kit in kits:
+            print(str(i) + ". " + kit.heading_caps())
+            index_map[i] = ("kit", kit)
+            i = i + 1
+        print(str(i) + ". BACK")
+        sel = self._input_int("Select Option Number: ", 1, i)
+        if sel == i:
+            return
+        kind, obj = index_map[sel]
+        q = self._input_int("Quantity: ", 1)
+        if kind == "comp":
+            self.app.buy_component(obj, q)
+            print("Adding " + str(q) + " x " + self._component_caps(obj))
+        else:
+            ok = self.app.buy_circuit(obj.name, q)
+            if ok:
+                print("Adding " + str(q) + " x " + obj.heading_caps())
+            else:
+                print("Kit not found.")
 
     def customer_sales_menu(self) -> None:
-        def add_item() -> None:
-            comp = self.app.list_component_rows()
-            kits = self.app.list_circuit_objects()
-            options: List[Tuple[str, Optional[Callable[[], None]]]] = []
-            for qty, frag in comp:
-                title = self._component_row_to_caps_title(frag)
-                price = self._extract_price_string(frag)
-                label = title + " $" + price + " X " + str(qty)
-                def make_sell(f: str, have: int, pretty: str) -> Callable[[], None]:
-                    def _inner() -> None:
-                        q = self._input_int("Quantity: ", 1, None)
-                        if q > have:
-                            print("Not enough stock.")
-                            return
-                        ok = self.app.sell_component(f, q)
-                        if ok:
-                            print("Adding " + str(q) + " x " + pretty)
-                        else:
-                            print("Not enough stock.")
-                    return _inner
-                options.append((label, make_sell(frag, qty, title)))
-            for qty, kit in kits:
-                label = kit.heading_caps() + " X " + str(qty)
-                def make_sell_kit(k: CircuitKit, have: int) -> Callable[[], None]:
-                    def _inner() -> None:
-                        q = self._input_int("Quantity: ", 1, None)
-                        if q > have:
-                            print("Not enough stock.")
-                            return
-                        ok = self.app.sell_circuit(k.name, q)
-                        if ok:
-                            print("Adding " + str(q) + " x " + k.heading_caps())
-                        else:
-                            print("Not enough stock.")
-                    return _inner
-                options.append((label, make_sell_kit(kit, qty)))
-            options.append(("BACK", None))
-            SelectorMenu("CUSTOMER SALE INVENTORY", options).run()
-        again = SelectorMenu("CUSTOMER SALE", [
-            ("Add Item from Inventory to Sale", add_item),
+        Menu("CUSTOMER SALE", [
+            ("Add Item from Inventory to Sale", self._customer_sale_add_item),
             ("BACK (CANCEL ORDER)", None),
-        ]).run()
-        if again:
-            self.customer_sales_menu()
+        ], prompt="Select Option Number: ").run()
+
+    def _customer_sale_add_item(self) -> None:
+        comp = self.app.list_component_rows()
+        kits = self.app.list_circuit_objects()
+        index_map = {}
+        i = 1
+        print("CUSTOMER SALE INVENTORY")
+        for qty, frag in comp:
+            print(str(i) + ". " + self._component_caps(frag) + " X " + str(qty))
+            index_map[i] = ("comp", frag, qty)
+            i = i + 1
+        for qty, kit in kits:
+            print(str(i) + ". " + kit.heading_caps() + " X " + str(qty))
+            index_map[i] = ("kit", kit, qty)
+            i = i + 1
+        print(str(i) + ". BACK")
+        sel = self._input_int("Select Option Number: ", 1, i)
+        if sel == i:
+            return
+        kind, obj, have = index_map[sel]
+        q = self._input_int("Quantity: ", 1)
+        if q > have:
+            print("Not enough stock.")
+            return
+        if kind == "comp":
+            ok = self.app.sell_component(obj, q)
+            if ok:
+                print("Adding " + str(q) + " x " + self._component_caps(obj))
+            else:
+                print("Not enough stock.")
+        else:
+            ok = self.app.sell_circuit(obj.name, q)
+            if ok:
+                print("Adding " + str(q) + " x " + obj.heading_caps())
+            else:
+                print("Not enough stock.")
 
     def transactions_menu(self) -> None:
-        lines = self._summarize_transactions()
+        lines = self.app.summarize_transactions()
         print("TRANSACTION HISTORY")
         if len(lines) == 0:
             print("No transactions yet.")
         else:
-            i = 1
-            for op_type, ts, total in lines:
-                print(str(i) + ". " + op_type + " " + ts + ", total $" + format(total, ".2f"))
-                i = i + 1
-
-        again = SelectorMenu(
-            "TRANSACTION HISTORY",
-            [
-                ("SORT", self.sort_transactions_menu),
-                ("BACK", None),
-            ],
-            prompt="Select Option Number: "
-        ).run()
-        if again:
-            self.transactions_menu()
-
-    def sort_transactions_menu(self) -> None:
-        again = SelectorMenu(
-            "SORT OPTIONS",
-            [
-                ("Sort by date (ascending)", lambda: None),
-                ("Sort by date (descending)", lambda: None),
-                ("Sort by wholesale price (ascending)", lambda: None),
-                ("Sort by wholesale price (descending)", lambda: None),
-                ("Sort by retail price (ascending)", lambda: None),
-                ("Sort by retail price (descending)", lambda: None),
-                ("BACK (CANCEL SORTING)", None),
-            ],
-            prompt="Select option number: "
-        ).run()
-        if again:
-            self.sort_transactions_menu()
+            for i, (op, ts, total) in enumerate(lines, 1):
+                print(str(i) + ". " + op + " " + ts + ", total $" + format(total, ".2f"))
+        Menu("TRANSACTION HISTORY", [
+            ("SORT", lambda: None),
+            ("BACK", None),
+        ], prompt="Select Option Number: ").run()
 
     def close_app(self) -> None:
         print("Saving and Closing")
         self.app.save_components()
-        self.app.save_circuits()
-        sys.exit(0)
+        self.app.save_kits()
+        raise SystemExit(0)
 
-    def create_wire(self) -> None:
-        print("NEW WIRE")
-        length_mm = self._input_float("Please enter length (mm): ", 0.001, None)
-        price = self._input_float("Please enter price: ", 0.0, None)
-        qty = self._input_int("Please enter number of Wires: ", 1, None)
-        frag = "Wire," + str(int(round(length_mm))) + "," + format(price, ".2f")
-        self.app.buy_component(frag, qty)
-        print("Added " + str(int(round(length_mm))) + "mm Wire $" + format(price, ".2f") + " X " + str(qty))
-
-    def create_battery(self) -> None:
-        print("NEW BATTERY")
-        print("Battery sizes are AA or AAA or C or D or E")
-        size = input("Please enter battery size: ").strip().upper()
-        valid = {"AA": [1.2, 1.5], "AAA": [1.2, 1.5], "C": [1.2, 1.5], "D": [1.5], "E": [9.0]}
-        while size not in valid:
-            print("Invalid size. Valid: AA, AAA, C, D, E")
-            size = input("Please enter battery size: ").strip().upper()
-        print("AA, AAA and C batteries are either 1.2 Volts or 1.5 Volts")
-        print("D batteries are 1.5 Volts")
-        print("E batteries are 9.0 Volts")
-        voltage = self._input_float("Please enter a voltage that matches the battery size: ", 0.0, None)
-        allowed = [round(v, 2) for v in valid[size]]
-        while round(voltage, 2) not in allowed:
-            print("Voltage does not match the selected size. Allowed: " + ", ".join([str(v) for v in valid[size]]))
-            voltage = self._input_float("Please enter a voltage that matches the battery size: ", 0.0, None)
-        price = self._input_float("Please enter price: ", 0.0, None)
-        qty = self._input_int("Please enter number of Batteries: ", 1, None)
-        frag = "Battery," + size + "," + format(voltage, ".1f") + "," + format(price, ".2f")
-        self.app.buy_component(frag, qty)
-        print("Added " + format(voltage, ".1f") + "V " + size + " Battery $" + format(price, ".2f") + " X " + str(qty))
-
-    def create_solar_panel(self) -> None:
-        print("NEW SOLAR PANEL")
-        print("Voltage is usually between 1 and 12")
-        voltage = self._input_float("Please enter voltage (V): ", 0.0001, None)
-        print("Current is usually between 100 and 1000 milliAmps")
-        current_mA = self._input_float("Please enter current (mA): ", 0.0001, None)
-        price = self._input_float("Please enter price: ", 0.0, None)
-        qty = self._input_int("Please enter number of Solar Panels: ", 1, None)
-        frag = "Solar Panel," + format(voltage, ".1f") + "," + format(current_mA, ".1f") + "," + format(price, ".2f")
-        self.app.buy_component(frag, qty)
-        print("Added " + format(voltage, ".1f") + "V " + format(current_mA, ".1f") + "mA Solar Panel $" + format(price, ".2f") + " X " + str(qty))
-
-    def create_light_globe(self) -> None:
-        print("NEW LIGHT GLOBE")
-        print("Light Globe Colours:")
-        print("warm, neutral, cool")
-        allowed = {"warm", "neutral", "cool"}
-        colour = input("Please enter light globe colour: ").strip().lower()
-        while colour not in allowed:
-            print("Invalid colour. Valid: warm, neutral, cool")
-            colour = input("Please enter light globe colour: ").strip().lower()
-        print("Voltage is usually between 1 and 12")
-        voltage = self._input_float("Please enter voltage (V): ", 0.0001, None)
-        print("Current is usually between 100 and 1000 milliAmps")
-        current_mA = self._input_float("Please enter current (mA): ", 0.0001, None)
-        price = self._input_float("Please enter price: ", 0.0, None)
-        qty = self._input_int("Please enter number of Light Globes: ", 1, None)
-        frag = "Light Globe," + colour + "," + format(voltage, ".1f") + "," + format(current_mA, ".1f") + "," + format(price, ".2f")
-        self.app.buy_component(frag, qty)
-        label = self._to_title(colour)
-        print("Added " + format(voltage, ".1f") + "V " + format(current_mA, ".1f") + "mA " + label + " Light Globe $" + format(price, ".2f") + " X " + str(qty))
-
-    def create_led_light(self) -> None:
-        print("NEW LED LIGHT")
-        print("LED Light Colours:")
-        print("white, red, green, blue, yellow, orange, pink, aqua, violet")
-        allowed = {"white","red","green","blue","yellow","orange","pink","aqua","violet"}
-        colour = input("Please enter LED light colour: ").strip().lower()
-        while colour not in allowed:
-            print("Invalid colour. Valid: white, red, green, blue, yellow, orange, pink, aqua, violet")
-            colour = input("Please enter LED light colour: ").strip().lower()
-        print("Voltage is usually between 1 and 12")
-        voltage = self._input_float("Please enter voltage (V): ", 0.0001, None)
-        print("Current is usually between 100 and 1000 milliAmps")
-        current_mA = self._input_float("Please enter current (mA): ", 0.0001, None)
-        price = self._input_float("Please enter price: ", 0.0, None)
-        qty = self._input_int("Please enter number of LED Lights: ", 1, None)
-        frag = "LED Light," + colour + "," + format(voltage, ".1f") + "," + format(current_mA, ".1f") + "," + format(price, ".2f")
-        self.app.buy_component(frag, qty)
-        label = self._to_title(colour)
-        print("Added " + format(voltage, ".1f") + "V " + format(current_mA, ".1f") + "mA " + label + " LED Light $" + format(price, ".2f") + " X " + str(qty))
-
-    def create_switch(self) -> None:
-        print("NEW SWITCH")
-        print("Switch types:")
-        print("push, slide, rocker, toggle")
-        allowed = {"push","slide","rocker","toggle"}
-        swtype = input("Please enter switch type: ").strip().lower()
-        while swtype not in allowed:
-            print("Invalid type. Valid: push, slide, rocker, toggle")
-            swtype = input("Please enter switch type: ").strip().lower()
-        print("Voltage is usually between 1 and 12")
-        voltage = self._input_float("Please enter voltage (V): ", 0.0001, None)
-        price = self._input_float("Please enter price: ", 0.0, None)
-        qty = self._input_int("Please enter number of Switches: ", 1, None)
-        frag = "Switch," + swtype + "," + format(voltage, ".1f") + "," + format(price, ".2f")
-        self.app.buy_component(frag, qty)
-        print("Added " + format(voltage, ".1f") + "V " + self._to_title(swtype) + " Switch $" + format(price, ".2f") + " X " + str(qty))
-
-    def create_sensor(self) -> None:
-        print("NEW SENSOR")
-        print("Sensor types:")
-        print("light, motion, infrared, sound, touch, dust, temperature, humidity")
-        allowed = {"light","motion","infrared","sound","touch","dust","temperature","humidity"}
-        stype = input("Please enter sensor type: ").strip().lower()
-        while stype not in allowed:
-            print("Invalid type. Valid: light, motion, infrared, sound, touch, dust, temperature, humidity")
-            stype = input("Please enter sensor type: ").strip().lower()
-        print("Voltage is usually between 1 and 12")
-        voltage = self._input_float("Please enter voltage (V): ", 0.0001, None)
-        price = self._input_float("Please enter price: ", 0.0, None)
-        qty = self._input_int("Please enter number of Sensors: ", 1, None)
-        frag = "Sensor," + stype + "," + format(voltage, ".1f") + "," + format(price, ".2f")
-        self.app.buy_component(frag, qty)
-        print("Added " + format(voltage, ".1f") + "V " + self._to_title(stype) + " Sensor $" + format(price, ".2f") + " X " + str(qty))
-
-    def create_buzzer(self) -> None:
-        print("NEW BUZZER")
-        freq = self._input_float("Please enter frequency (Hz): ", 0.0001, None)
-        spl  = self._input_float("Please enter sound pressure (dB): ", 0.0001, None)
-        print("Voltage is usually between 1 and 12")
-        voltage = self._input_float("Please enter voltage (V): ", 0.0001, None)
-        print("Current is usually between 100 and 1000 milliAmps")
-        current_mA = self._input_float("Please enter current (mA): ", 0.0001, None)
-        price = self._input_float("Please enter price: ", 0.0, None)
-        qty = self._input_int("Please enter number of Buzzers: ", 1, None)
-        frag = "Buzzer," + format(freq, ".1f") + "," + format(spl, ".1f") + "," + format(voltage, ".1f") + "," + format(current_mA, ".1f") + "," + format(price, ".2f")
-        self.app.buy_component(frag, qty)
-        print("Added " + format(voltage, ".1f") + "V " + format(current_mA, ".1f") + "mA " + format(freq, ".1f") + "Hz " + str(int(round(spl))) + "dB Buzzer $" + format(price, ".2f") + " X " + str(qty))
-
-
-class Menu:
-    def __init__(self, app) -> None:
-        self.app = app
-
-    def run(self) -> None:
-        UI(self.app).home()
+    def datetime_now() -> str:
+        import datetime
+        return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
